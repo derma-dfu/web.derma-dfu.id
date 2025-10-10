@@ -79,7 +79,7 @@ const Footer = () => {
             </p>
             
             <div className="flex items-center gap-2">
-              <span className="text-secondary-foreground/60 text-xs">Powered by</span>
+              <span className="text-secondary-foreground/60 text-sm">Powered by</span>
               <a 
                 href="https://metaderma.id" 
                 target="_blank" 
@@ -89,7 +89,7 @@ const Footer = () => {
                 <img 
                   src={metadermaLogo} 
                   alt="Metaderma" 
-                  className="h-4 w-auto object-contain"
+                  className="h-5 w-auto object-contain"
                 />
               </a>
             </div>
