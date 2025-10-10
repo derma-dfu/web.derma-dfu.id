@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Mail, Phone, MapPin } from 'lucide-react';
 import logoImage from '@/assets/logo-derma-dfu.png';
+import metadermaLogo from '@/assets/partners/metaderma-logo.png';
 
 const Footer = () => {
   const { t } = useLanguage();
@@ -86,17 +87,21 @@ const Footer = () => {
             </div>
           </div>
           <div className="text-center">
-            <p className="text-secondary-foreground/60 text-xs">
-              Powered by{' '}
+            <div className="flex items-center justify-center gap-2">
+              <span className="text-secondary-foreground/60 text-xs">Powered by</span>
               <a 
                 href="https://metaderma.id" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="text-primary hover:text-primary/80 font-medium transition-colors"
+                className="inline-block transition-opacity hover:opacity-80"
               >
-                metaderma.id
+                <img 
+                  src={metadermaLogo} 
+                  alt="Metaderma" 
+                  className="h-5 w-auto object-contain"
+                />
               </a>
-            </p>
+            </div>
           </div>
         </div>
       </div>
