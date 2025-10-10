@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { ShoppingCart } from 'lucide-react';
+import { MessageCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 const Products = () => {
@@ -89,11 +89,10 @@ const Products = () => {
     ? products 
     : products.filter(p => p.category === selectedCategory);
 
-  const handleAddToCart = (productTitle: { id: string; en: string }) => {
-    toast({
-      title: t({ id: 'Ditambahkan ke Keranjang', en: 'Added to Cart' }),
-      description: `${t(productTitle)} ${t({ id: 'telah ditambahkan', en: 'has been added' })}`,
-    });
+  const handleOrderWhatsApp = (productTitle: { id: string; en: string }) => {
+    const message = encodeURIComponent(`Halo, saya tertarik untuk memesan ${t(productTitle)}`);
+    const whatsappNumber = '6281234567890'; // Update with actual WhatsApp number
+    window.open(`https://wa.me/${whatsappNumber}?text=${message}`, '_blank');
   };
 
   return (
@@ -146,15 +145,14 @@ const Products = () => {
                     </li>
                   ))}
                 </ul>
-                <p className="text-2xl font-bold text-primary mt-4">{product.price}</p>
               </CardContent>
               <CardFooter>
                 <Button 
                   className="w-full min-h-[44px]"
-                  onClick={() => handleAddToCart(product.title)}
+                  onClick={() => handleOrderWhatsApp(product.title)}
                 >
-                  <ShoppingCart className="mr-2 h-4 w-4" />
-                  {t({ id: 'Tambah ke Keranjang', en: 'Add to Cart' })}
+                  <MessageCircle className="mr-2 h-4 w-4" />
+                  {t({ id: 'Pesan Sekarang', en: 'Order Now' })}
                 </Button>
               </CardFooter>
             </Card>
