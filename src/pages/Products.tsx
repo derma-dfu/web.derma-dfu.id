@@ -51,7 +51,7 @@ const Products = () => {
     return () => {
       mounted = false;
     };
-  }, [toast, t]);
+  }, []);
 
 
   const categories = [

@@ -49,7 +49,7 @@ const Education = () => {
     return () => {
       mounted = false;
     };
-  }, [toast, t]);
+  }, []);
 
 
   const categories = [
