@@ -71,17 +71,32 @@ const Footer = () => {
           </div>
         </div>
 
-        <div className="border-t border-secondary-foreground/20 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center">
-          <p className="text-secondary-foreground/80 text-sm">
-            © 2025 DERMA-DFU.ID. {t({ id: 'Hak Cipta Dilindungi', en: 'All Rights Reserved' })}.
-          </p>
-          <div className="flex space-x-6 mt-4 md:mt-0">
-            <Link to="/privacy" className="text-secondary-foreground/80 hover:text-primary text-sm">
-              {t({ id: 'Kebijakan Privasi', en: 'Privacy Policy' })}
-            </Link>
-            <Link to="/terms" className="text-secondary-foreground/80 hover:text-primary text-sm">
-              {t({ id: 'Syarat & Ketentuan', en: 'Terms & Conditions' })}
-            </Link>
+        <div className="border-t border-secondary-foreground/20 mt-8 pt-8">
+          <div className="flex flex-col md:flex-row justify-between items-center mb-4">
+            <p className="text-secondary-foreground/80 text-sm">
+              © 2025 DERMA-DFU.ID. {t({ id: 'Hak Cipta Dilindungi', en: 'All Rights Reserved' })}.
+            </p>
+            <div className="flex space-x-6 mt-4 md:mt-0">
+              <Link to="/privacy" className="text-secondary-foreground/80 hover:text-primary text-sm">
+                {t({ id: 'Kebijakan Privasi', en: 'Privacy Policy' })}
+              </Link>
+              <Link to="/terms" className="text-secondary-foreground/80 hover:text-primary text-sm">
+                {t({ id: 'Syarat & Ketentuan', en: 'Terms & Conditions' })}
+              </Link>
+            </div>
+          </div>
+          <div className="text-center">
+            <p className="text-secondary-foreground/60 text-xs">
+              Powered by{' '}
+              <a 
+                href="https://metaderma.id" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-primary hover:text-primary/80 font-medium transition-colors"
+              >
+                metaderma.id
+              </a>
+            </p>
           </div>
         </div>
       </div>
