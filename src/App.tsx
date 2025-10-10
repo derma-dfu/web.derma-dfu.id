@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { LanguageProvider } from "./contexts/LanguageContext";
 import Navigation from "./components/Navigation";
 import Footer from "./components/Footer";
+import ChatWidget from "./components/ChatWidget";
 import Home from "./pages/Home";
 import Products from "./pages/Products";
 import Partners from "./pages/Partners";
@@ -26,6 +27,7 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <Navigation />
+          <ChatWidget />
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/products" element={<Products />} />
