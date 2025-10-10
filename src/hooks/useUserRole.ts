@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { User } from '@supabase/supabase-js';
 
@@ -9,102 +9,110 @@ export const useUserRole = () => {
   const [role, setRole] = useState<UserRole>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  const fetchUserRole = useCallback(async (userId: string) => {
-    console.log('Fetching user role for:', userId);
-    
-    // Set timeout to prevent infinite loading
-    const timeoutId = setTimeout(() => {
-      console.warn('Role fetch timeout - defaulting to user');
-      setRole('user');
-      setIsLoading(false);
-    }, 5000);
-
-    try {
-      const { data, error } = await supabase
-        .from('user_roles')
-        .select('role')
-        .eq('user_id', userId)
-        .maybeSingle();
-
-      clearTimeout(timeoutId);
-      console.log('User role fetch result:', { data, error });
-
-      if (error) {
-        console.error('Error fetching user role:', error);
-        setRole('user');
-      } else {
-        const userRole = (data?.role as UserRole) ?? 'user';
-        console.log('Setting role to:', userRole);
-        setRole(userRole);
-      }
-    } catch (error) {
-      clearTimeout(timeoutId);
-      console.error('Exception fetching user role:', error);
-      setRole('user');
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
-
   useEffect(() => {
     let mounted = true;
+    let timeoutId: NodeJS.Timeout;
 
-    const initAuth = async () => {
+    const getUserRole = async (userId: string) => {
+      console.log('Getting role for user:', userId);
+      
+      // Safety timeout
+      timeoutId = setTimeout(() => {
+        if (mounted) {
+          console.warn('Role query timeout, defaulting to user');
+          setRole('user');
+          setIsLoading(false);
+        }
+      }, 3000);
+
       try {
-        const { data: { session } } = await supabase.auth.getSession();
+        const { data, error } = await supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', userId)
+          .maybeSingle();
+
         if (!mounted) return;
         
-        console.log('Initial session:', session?.user?.email || 'No session');
-        setUser(session?.user ?? null);
+        clearTimeout(timeoutId);
+
+        if (error) {
+          console.error('Role query error:', error);
+          setRole('user');
+        } else {
+          console.log('Role fetched:', data?.role || 'user');
+          setRole((data?.role as UserRole) || 'user');
+        }
+        setIsLoading(false);
+      } catch (err) {
+        if (mounted) {
+          console.error('Role fetch exception:', err);
+          clearTimeout(timeoutId);
+          setRole('user');
+          setIsLoading(false);
+        }
+      }
+    };
+
+    const initializeAuth = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        
+        if (!mounted) return;
+
+        console.log('Init session:', session?.user?.email || 'none');
         
         if (session?.user) {
-          await fetchUserRole(session.user.id);
+          setUser(session.user);
+          await getUserRole(session.user.id);
         } else {
+          setUser(null);
           setRole(null);
           setIsLoading(false);
         }
-      } catch (error) {
-        console.error('Error initializing auth:', error);
+      } catch (err) {
+        console.error('Auth init error:', err);
         if (mounted) {
+          setUser(null);
           setRole(null);
           setIsLoading(false);
         }
       }
     };
 
+    // Subscribe to auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         if (!mounted) return;
-        
-        console.log('Auth state changed:', event, session?.user?.email || 'No session');
-        
-        setUser(session?.user ?? null);
-        
+
+        console.log('Auth changed:', event, session?.user?.email || 'none');
+
         if (session?.user) {
-          await fetchUserRole(session.user.id);
+          setUser(session.user);
+          setIsLoading(true);
+          await getUserRole(session.user.id);
         } else {
+          setUser(null);
           setRole(null);
           setIsLoading(false);
         }
       }
     );
 
-    initAuth();
+    initializeAuth();
 
     return () => {
       mounted = false;
+      if (timeoutId) clearTimeout(timeoutId);
       subscription.unsubscribe();
     };
-  }, [fetchUserRole]);
-
-  const isAdmin = role === 'admin';
-  const isAuthenticated = !!user;
+  }, []); // Empty deps - run once
 
   return {
     user,
     role,
-    isAdmin,
-    isAuthenticated,
+    isAdmin: role === 'admin',
+    isAuthenticated: !!user,
     isLoading,
   };
 };

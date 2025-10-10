@@ -2,7 +2,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Globe, Menu, X, LogOut, User } from 'lucide-react';
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import logoImage from '@/assets/logo-derma-dfu.png';
 import { supabase } from '@/integrations/supabase/client';
 import { useUserRole } from '@/hooks/useUserRole';
@@ -18,14 +18,11 @@ import {
 const Navigation = () => {
   const { language, setLanguage, t } = useLanguage();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const { isAuthenticated, user, isLoading } = useUserRole();
+  const authState = useUserRole();
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  // Memoize to prevent unnecessary re-renders
-  const userEmail = useMemo(() => user?.email?.split('@')[0] || '', [user?.email]);
-
-  console.log('Navigation render:', { isAuthenticated, userEmail: user?.email, isLoading });
+  const { isAuthenticated, user, isLoading } = authState;
 
   const handleLogout = async () => {
     setMobileMenuOpen(false);
@@ -128,7 +125,7 @@ const Navigation = () => {
                 <DropdownMenuTrigger asChild>
                   <Button variant="outline" className="min-h-[44px]">
                     <User className="h-4 w-4 mr-2" />
-                    {userEmail || t({ id: 'Akun', en: 'Account' })}
+                    {user?.email?.split('@')[0] || t({ id: 'Akun', en: 'Account' })}
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
@@ -201,7 +198,7 @@ const Navigation = () => {
                   }}
                 >
                   <User className="h-5 w-5 mr-2" />
-                  {userEmail || t({ id: 'Akun', en: 'Account' })}
+                  {user?.email?.split('@')[0] || t({ id: 'Akun', en: 'Account' })}
                 </Button>
                 <Button
                   variant="outline"
