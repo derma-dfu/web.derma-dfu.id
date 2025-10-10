@@ -95,7 +95,7 @@ const Products = () => {
   }
 
   return (
-    <div className="min-h-screen py-12 px-4">
+    <div className="min-h-screen py-12 px-4 bg-background">
       <div className="container mx-auto">
         {/* Header */}
         <div className="mb-8">
@@ -169,7 +169,7 @@ const Products = () => {
         </div>
 
         {/* Policy Info */}
-        <div className="mt-12 p-6 bg-muted/30 rounded-2xl">
+        <div className="mt-12 p-6 bg-background rounded-2xl border border-border">
           <h3 className="text-xl font-bold mb-4 text-secondary">
             {t({ id: 'Kebijakan Pembelian', en: 'Purchase Policy' })}
           </h3>
