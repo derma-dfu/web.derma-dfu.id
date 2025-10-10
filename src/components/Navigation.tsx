@@ -66,14 +66,14 @@ const Navigation = () => {
 
   return (
     <nav className="sticky top-0 z-50 bg-background/95 backdrop-blur border-b border-border shadow-sm">
-      <div className="container mx-auto px-4 py-3">
+      <div className="container mx-auto px-4 py-2">
         <div className="flex items-center justify-between">
           {/* Logo */}
           <Link to="/" className="flex items-center">
             <img 
               src={logoImage} 
               alt="DERMA-DFU.ID" 
-              className="h-12 md:h-16 w-auto object-contain"
+              className="h-10 md:h-14 w-auto object-contain"
             />
           </Link>
 
