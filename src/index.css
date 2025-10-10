@@ -24,9 +24,9 @@ All colors MUST be HSL.
     --primary: 344 57% 78%;
     --primary-foreground: 0 0% 100%;
     
-    /* Secondary - Navy for headings */
-    --secondary: 214 84% 28%;
-    --secondary-foreground: 0 0% 100%;
+    /* Secondary - Blue #8fc7ea */
+    --secondary: 203 70% 74%;
+    --secondary-foreground: 220 26% 14%;
     
     /* Muted colors - using light blue tint */
     --muted: 203 70% 94%;
