@@ -104,12 +104,10 @@ const Navigation = () => {
               </Link>
             ))}
             
-            {!isAuthenticated && !isLoading ? (
-              <Link to="/auth">
-                <Button variant="outline" className="min-h-[44px]">
-                  {t({ id: 'Masuk', en: 'Login' })}
-                </Button>
-              </Link>
+            {isLoading ? (
+              <Button variant="outline" className="min-h-[44px]" disabled>
+                {t({ id: 'Memuat...', en: 'Loading...' })}
+              </Button>
             ) : isAuthenticated ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -128,7 +126,13 @@ const Navigation = () => {
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
-            ) : null}
+            ) : (
+              <Link to="/auth">
+                <Button variant="outline" className="min-h-[44px]">
+                  {t({ id: 'Masuk', en: 'Login' })}
+                </Button>
+              </Link>
+            )}
             
             <Button
               variant="ghost"
@@ -167,12 +171,10 @@ const Navigation = () => {
               </Link>
             ))}
             
-            {!isAuthenticated && !isLoading ? (
-              <Link to="/auth" onClick={() => setMobileMenuOpen(false)}>
-                <Button variant="outline" className="w-full min-h-[44px]">
-                  {t({ id: 'Masuk', en: 'Login' })}
-                </Button>
-              </Link>
+            {isLoading ? (
+              <Button variant="outline" className="w-full min-h-[44px]" disabled>
+                {t({ id: 'Memuat...', en: 'Loading...' })}
+              </Button>
             ) : isAuthenticated ? (
               <>
                 <Button
@@ -198,7 +200,13 @@ const Navigation = () => {
                   {t({ id: 'Keluar', en: 'Logout' })}
                 </Button>
               </>
-            ) : null}
+            ) : (
+              <Link to="/auth" onClick={() => setMobileMenuOpen(false)}>
+                <Button variant="outline" className="w-full min-h-[44px]">
+                  {t({ id: 'Masuk', en: 'Login' })}
+                </Button>
+              </Link>
+            )}
             
             <Button
               variant="ghost"
