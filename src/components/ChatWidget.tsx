@@ -112,14 +112,7 @@ const ChatWidget = () => {
         showWelcomeScreen: false,
         defaultLanguage: 'id',
         initialMessages: [
-          'Halo! 👋 Selamat datang di DERMA-DFU.ID',
-          'Kami siap membantu Anda 24/7 dengan informasi seputar:',
-          '• Perawatan luka kaki diabetik (Diabetic Foot Ulcer)',
-          '• Produk medis dan alat kesehatan',
-          '• Layanan teledermatologi',
-          '• Informasi kemitraan',
-          '',
-          'Silakan tanyakan apa yang ingin Anda ketahui!'
+          'Halo! 👋 Selamat datang di DERMA-DFU.ID'
         ],
         i18n: {
           id: {
