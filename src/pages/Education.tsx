@@ -13,29 +13,44 @@ const Education = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchArticles();
-  }, []);
+    let mounted = true;
+    
+    const loadArticles = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('articles')
+          .select('*')
+          .eq('is_published', true)
+          .order('created_at', { ascending: false });
 
-  const fetchArticles = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('articles')
-        .select('*')
-        .eq('is_published', true)
-        .order('created_at', { ascending: false });
+        if (error) throw error;
+        
+        if (mounted) {
+          setArticles(data || []);
+        }
+      } catch (error: any) {
+        console.error('Error fetching articles:', error);
+        if (mounted) {
+          toast({
+            title: t({ id: 'Error', en: 'Error' }),
+            description: error.message,
+            variant: 'destructive',
+          });
+        }
+      } finally {
+        if (mounted) {
+          setLoading(false);
+        }
+      }
+    };
+    
+    loadArticles();
+    
+    return () => {
+      mounted = false;
+    };
+  }, [toast, t]);
 
-      if (error) throw error;
-      setArticles(data || []);
-    } catch (error: any) {
-      toast({
-        title: t({ id: 'Error', en: 'Error' }),
-        description: error.message,
-        variant: 'destructive',
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const categories = [
     { value: 'all', label: { id: 'Semua', en: 'All' } },
