@@ -77,13 +77,13 @@ const Home = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             {/* Left Column - Text */}
             <div className="text-left animate-fade-in">
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-secondary">
+              <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6 text-secondary leading-tight">
                 {t({ 
                   id: 'Solusi Terpadu Perawatan Luka Diabetes',
                   en: 'Comprehensive Diabetic Wound Care Solution'
                 })}
               </h1>
-              <p className="text-lg md:text-xl text-foreground/80 mb-8">
+              <p className="text-base md:text-lg text-foreground/80 mb-8 leading-relaxed">
                 {t({ 
                   id: 'Platform inovatif yang menghubungkan pasien, mitra, dan profesional kesehatan',
                   en: 'Innovative platform connecting patients, partners, and healthcare professionals'
