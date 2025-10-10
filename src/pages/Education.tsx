@@ -96,7 +96,7 @@ const Education = () => {
 
           {categories.map((cat) => (
             <TabsContent key={cat.value} value={cat.value}>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {(cat.value === 'all' 
                   ? articles 
                   : articles.filter(a => a.category === cat.value)
