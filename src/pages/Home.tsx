@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { ArrowRight, CheckCircle, Heart, Shield, Users } from 'lucide-react';
+import heroImage from '@/assets/hero-nurse-patient.png';
 
 const Home = () => {
   const { t } = useLanguage();
@@ -73,25 +74,39 @@ const Home = () => {
       {/* Hero Section */}
       <section className="relative py-20 px-4 overflow-hidden">
         <div className="container mx-auto">
-          <div className="max-w-3xl mx-auto text-center animate-fade-in">
-            <h1 className="text-5xl md:text-6xl font-bold mb-6 text-secondary">
-              {t({ 
-                id: 'Solusi Terpadu Perawatan Luka Diabetes',
-                en: 'Comprehensive Diabetic Wound Care Solution'
-              })}
-            </h1>
-            <p className="text-xl text-foreground/80 mb-8">
-              {t({ 
-                id: 'Platform inovatif yang menghubungkan pasien, mitra, dan profesional kesehatan',
-                en: 'Innovative platform connecting patients, partners, and healthcare professionals'
-              })}
-            </p>
-            <a href="https://derma-dfu.id/" target="_blank" rel="noopener noreferrer">
-              <Button size="lg" className="min-h-[48px] text-lg px-8 bg-cta hover:bg-cta/90">
-                {t({ id: 'Coba Triase Sekarang', en: 'Try Triage Now' })}
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
-            </a>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            {/* Left Column - Text */}
+            <div className="text-left animate-fade-in">
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-secondary">
+                {t({ 
+                  id: 'Solusi Terpadu Perawatan Luka Diabetes',
+                  en: 'Comprehensive Diabetic Wound Care Solution'
+                })}
+              </h1>
+              <p className="text-lg md:text-xl text-foreground/80 mb-8">
+                {t({ 
+                  id: 'Platform inovatif yang menghubungkan pasien, mitra, dan profesional kesehatan',
+                  en: 'Innovative platform connecting patients, partners, and healthcare professionals'
+                })}
+              </p>
+              <a href="https://derma-dfu.id/" target="_blank" rel="noopener noreferrer">
+                <Button size="lg" className="min-h-[48px] text-lg px-8 bg-cta hover:bg-cta/90">
+                  {t({ id: 'Coba Triase Sekarang', en: 'Try Triage Now' })}
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </Button>
+              </a>
+            </div>
+
+            {/* Right Column - Image */}
+            <div className="relative animate-fade-in">
+              <div className="rounded-2xl overflow-hidden shadow-2xl">
+                <img 
+                  src={heroImage} 
+                  alt="Professional nurse providing diabetic foot wound care to patient"
+                  className="w-full h-auto object-cover"
+                />
+              </div>
+            </div>
           </div>
         </div>
       </section>
