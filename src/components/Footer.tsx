@@ -73,36 +73,34 @@ const Footer = () => {
         </div>
 
         <div className="border-t border-secondary-foreground/20 mt-8 pt-6">
-          <div className="flex flex-col md:flex-row justify-between items-center">
-            <div className="text-center md:text-left">
-              <p className="text-secondary-foreground/80 text-sm mb-2">
-                © 2025 DERMA-DFU.ID. {t({ id: 'Hak Cipta Dilindungi', en: 'All Rights Reserved' })}.
-              </p>
-              <div className="flex space-x-6 mt-2">
-                <Link to="/privacy" className="text-secondary-foreground/80 hover:text-primary text-sm">
-                  {t({ id: 'Kebijakan Privasi', en: 'Privacy Policy' })}
-                </Link>
-                <Link to="/terms" className="text-secondary-foreground/80 hover:text-primary text-sm">
-                  {t({ id: 'Syarat & Ketentuan', en: 'Terms & Conditions' })}
-                </Link>
-              </div>
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+            <p className="text-secondary-foreground/80 text-sm">
+              © 2025 DERMA-DFU.ID. {t({ id: 'Hak Cipta Dilindungi', en: 'All Rights Reserved' })}.
+            </p>
+            
+            <div className="flex items-center gap-2">
+              <span className="text-secondary-foreground/60 text-xs">Powered by</span>
+              <a 
+                href="https://metaderma.id" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="inline-block transition-opacity hover:opacity-80"
+              >
+                <img 
+                  src={metadermaLogo} 
+                  alt="Metaderma" 
+                  className="h-4 w-auto object-contain"
+                />
+              </a>
             </div>
-            <div className="text-right mt-4 md:mt-0">
-              <div className="flex items-center justify-end gap-2">
-                <span className="text-secondary-foreground/60 text-xs">Powered by</span>
-                <a 
-                  href="https://metaderma.id" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="inline-block transition-opacity hover:opacity-80"
-                >
-                  <img 
-                    src={metadermaLogo} 
-                    alt="Metaderma" 
-                    className="h-4 w-auto object-contain"
-                  />
-                </a>
-              </div>
+            
+            <div className="flex space-x-4">
+              <Link to="/privacy" className="text-secondary-foreground/80 hover:text-primary text-sm">
+                {t({ id: 'Kebijakan Privasi', en: 'Privacy Policy' })}
+              </Link>
+              <Link to="/terms" className="text-secondary-foreground/80 hover:text-primary text-sm">
+                {t({ id: 'Syarat & Ketentuan', en: 'Terms & Conditions' })}
+              </Link>
             </div>
           </div>
         </div>
