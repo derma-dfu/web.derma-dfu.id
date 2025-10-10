@@ -72,17 +72,18 @@ const Home = () => {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="relative py-32 px-4 overflow-hidden min-h-[600px] flex items-center">
+      <section className="relative py-32 px-4 overflow-hidden min-h-[700px] flex items-center">
         {/* Background Image with Overlay */}
         <div 
           className="absolute inset-0 z-0"
           style={{
             backgroundImage: `url(${heroImage})`,
-            backgroundSize: 'cover',
+            backgroundSize: 'contain',
             backgroundPosition: 'right center',
+            backgroundRepeat: 'no-repeat',
           }}
         >
-          <div className="absolute inset-0 bg-gradient-to-r from-background from-40% via-background/85 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-r from-background from-50% via-background/90 to-transparent" />
         </div>
 
         {/* Content */}
