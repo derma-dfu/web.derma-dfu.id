@@ -12,12 +12,36 @@ export const useUserRole = () => {
   useEffect(() => {
     let mounted = true;
 
-    // Listen for auth changes FIRST
+    // Get initial session first
+    const initAuth = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!mounted) return;
+        
+        console.log('Initial session:', session?.user?.email || 'No session');
+        setUser(session?.user ?? null);
+        
+        if (session?.user) {
+          await fetchUserRole(session.user.id);
+        } else {
+          setRole(null);
+          setIsLoading(false);
+        }
+      } catch (error) {
+        console.error('Error initializing auth:', error);
+        if (mounted) {
+          setRole(null);
+          setIsLoading(false);
+        }
+      }
+    };
+
+    // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         if (!mounted) return;
         
-        console.log('Auth state changed:', event, session?.user?.email);
+        console.log('Auth state changed:', event, session?.user?.email || 'No session');
         
         setUser(session?.user ?? null);
         
@@ -29,25 +53,6 @@ export const useUserRole = () => {
         }
       }
     );
-
-    // THEN get initial session
-    const initAuth = async () => {
-      try {
-        const { data: { session } } = await supabase.auth.getSession();
-        if (!mounted) return;
-        
-        setUser(session?.user ?? null);
-        
-        if (session?.user) {
-          await fetchUserRole(session.user.id);
-        } else {
-          setIsLoading(false);
-        }
-      } catch (error) {
-        console.error('Error initializing auth:', error);
-        if (mounted) setIsLoading(false);
-      }
-    };
 
     initAuth();
 

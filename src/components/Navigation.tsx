@@ -24,24 +24,38 @@ const Navigation = () => {
   const handleLogout = async () => {
     setMobileMenuOpen(false);
     
-    const { error } = await supabase.auth.signOut();
-    
-    if (error) {
+    try {
+      // Clear session from Supabase
+      const { error } = await supabase.auth.signOut();
+      
+      if (error) {
+        console.error('Logout error:', error);
+        toast({
+          title: t({ id: 'Gagal keluar', en: 'Logout failed' }),
+          description: error.message,
+          variant: 'destructive',
+        });
+        return;
+      }
+      
+      // Success notification
+      toast({
+        title: t({ id: 'Berhasil keluar', en: 'Logged out successfully' }),
+        description: t({ id: 'Anda telah keluar dari akun', en: 'You have been logged out' }),
+      });
+      
+      // Navigate to home and force a hard reload to clear all state
+      setTimeout(() => {
+        window.location.href = '/';
+      }, 500);
+    } catch (error: any) {
       console.error('Logout error:', error);
       toast({
         title: t({ id: 'Gagal keluar', en: 'Logout failed' }),
-        description: error.message,
+        description: t({ id: 'Terjadi kesalahan', en: 'An error occurred' }),
         variant: 'destructive',
       });
-      return;
     }
-    
-    toast({
-      title: t({ id: 'Berhasil keluar', en: 'Logged out successfully' }),
-      description: t({ id: 'Anda telah keluar dari akun', en: 'You have been logged out' }),
-    });
-    
-    navigate('/');
   };
 
   const navLinks = [
