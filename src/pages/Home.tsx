@@ -72,7 +72,7 @@ const Home = () => {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="relative py-32 px-4 overflow-hidden min-h-[700px] flex items-center bg-gradient-to-br from-background via-muted/20 to-muted/40">
+      <section className="relative py-32 px-4 overflow-hidden min-h-[700px] flex items-center bg-background">
         {/* Background Image with Overlay */}
         <div 
           className="absolute inset-0 z-0"
@@ -81,11 +81,10 @@ const Home = () => {
             backgroundSize: 'cover',
             backgroundPosition: 'center right',
             backgroundRepeat: 'no-repeat',
-            opacity: 0.3,
+            opacity: 0.2,
           }}
-        >
-          <div className="absolute inset-0 bg-gradient-to-r from-background from-40% via-background/95 via-55% to-transparent" />
-        </div>
+        />
+        <div className="absolute inset-0 bg-background/80" />
 
         {/* Content */}
         <div className="container mx-auto relative z-10">
