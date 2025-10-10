@@ -249,11 +249,11 @@ const Partners = () => {
           </h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             {partnerLogos.map((partner, index) => (
-              <div key={index} className="bg-card rounded-2xl p-6 flex items-center justify-center hover-scale shadow-md">
+              <div key={index} className="bg-card rounded-2xl p-4 flex items-center justify-center hover-scale shadow-md">
                 <img 
                   src={partner.logo} 
                   alt={partner.name} 
-                  className="h-24 w-auto object-contain"
+                  className="h-28 w-auto object-contain"
                 />
               </div>
             ))}
