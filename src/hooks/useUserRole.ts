@@ -11,19 +11,17 @@ export const useUserRole = () => {
 
   useEffect(() => {
     let mounted = true;
-    let timeoutId: NodeJS.Timeout;
+    let fetchingRole = false;
 
     const getUserRole = async (userId: string) => {
+      // Prevent multiple simultaneous fetches
+      if (fetchingRole) {
+        console.log('Role fetch already in progress, skipping...');
+        return;
+      }
+
+      fetchingRole = true;
       console.log('Getting role for user:', userId);
-      
-      // Safety timeout
-      timeoutId = setTimeout(() => {
-        if (mounted) {
-          console.warn('Role query timeout, defaulting to user');
-          setRole('user');
-          setIsLoading(false);
-        }
-      }, 3000);
 
       try {
         const { data, error } = await supabase
@@ -32,9 +30,10 @@ export const useUserRole = () => {
           .eq('user_id', userId)
           .maybeSingle();
 
-        if (!mounted) return;
-        
-        clearTimeout(timeoutId);
+        if (!mounted) {
+          fetchingRole = false;
+          return;
+        }
 
         if (error) {
           console.error('Role query error:', error);
@@ -44,12 +43,13 @@ export const useUserRole = () => {
           setRole((data?.role as UserRole) || 'user');
         }
         setIsLoading(false);
+        fetchingRole = false;
       } catch (err) {
         if (mounted) {
           console.error('Role fetch exception:', err);
-          clearTimeout(timeoutId);
           setRole('user');
           setIsLoading(false);
+          fetchingRole = false;
         }
       }
     };
@@ -89,8 +89,11 @@ export const useUserRole = () => {
 
         if (session?.user) {
           setUser(session.user);
-          setIsLoading(true);
-          await getUserRole(session.user.id);
+          // Only fetch role if we don't have it yet or user changed
+          if (!fetchingRole) {
+            setIsLoading(true);
+            await getUserRole(session.user.id);
+          }
         } else {
           setUser(null);
           setRole(null);
@@ -103,7 +106,6 @@ export const useUserRole = () => {
 
     return () => {
       mounted = false;
-      if (timeoutId) clearTimeout(timeoutId);
       subscription.unsubscribe();
     };
   }, []); // Empty deps - run once
