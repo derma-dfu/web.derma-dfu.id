@@ -25,10 +25,11 @@ const Navigation = () => {
   const { isAuthenticated, user, isLoading } = authState;
 
   const handleLogout = async () => {
+    console.log('Logout button clicked');
     setMobileMenuOpen(false);
     
     try {
-      // Clear session from Supabase
+      console.log('Signing out from Supabase...');
       const { error } = await supabase.auth.signOut();
       
       if (error) {
@@ -41,7 +42,11 @@ const Navigation = () => {
         return;
       }
       
-      console.log('Logout successful, redirecting...');
+      console.log('Logout successful, clearing storage and redirecting...');
+      
+      // Clear all storage
+      localStorage.clear();
+      sessionStorage.clear();
       
       // Success notification
       toast({
@@ -50,9 +55,11 @@ const Navigation = () => {
       });
       
       // Force complete page reload to clear all state
-      window.location.href = '/';
+      setTimeout(() => {
+        window.location.href = '/';
+      }, 100);
     } catch (error: any) {
-      console.error('Logout error:', error);
+      console.error('Logout exception:', error);
       toast({
         title: t({ id: 'Gagal keluar', en: 'Logout failed' }),
         description: t({ id: 'Terjadi kesalahan', en: 'An error occurred' }),
@@ -132,7 +139,12 @@ const Navigation = () => {
                   <DropdownMenuItem onClick={() => navigate('/dashboard')}>
                     {t({ id: 'Dashboard', en: 'Dashboard' })}
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={handleLogout}>
+                  <DropdownMenuItem 
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handleLogout();
+                    }}
+                  >
                     <LogOut className="h-4 w-4 mr-2" />
                     {t({ id: 'Keluar', en: 'Logout' })}
                   </DropdownMenuItem>
@@ -203,7 +215,8 @@ const Navigation = () => {
                 <Button
                   variant="outline"
                   className="w-full min-h-[44px] justify-start"
-                  onClick={() => {
+                  onClick={(e) => {
+                    e.preventDefault();
                     setMobileMenuOpen(false);
                     handleLogout();
                   }}
