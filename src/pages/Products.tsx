@@ -127,7 +127,7 @@ const Products = () => {
         </div>
 
         {/* Products Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {filteredProducts.map((product) => (
             <Card key={product.id} className="flex flex-col rounded-2xl shadow-md hover-scale">
               <div className="p-6">
