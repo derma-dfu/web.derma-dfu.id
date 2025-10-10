@@ -130,7 +130,7 @@ const Products = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredProducts.map((product) => (
             <Card key={product.id} className="flex flex-col rounded-2xl shadow-md hover-scale">
-              <CardHeader className="p-6">
+              <div className="p-6">
                 {product.image_url || getProductImage(product.title_id) ? (
                   <div className="w-full h-48 mb-4 overflow-hidden rounded-lg">
                     <img 
@@ -142,15 +142,13 @@ const Products = () => {
                 ) : (
                   <div className="text-6xl mb-4 text-center">🩹</div>
                 )}
-                <CardTitle className="text-secondary text-xl min-h-[56px] flex items-center">
+                <h3 className="text-secondary text-xl font-semibold min-h-[56px] flex items-center mb-2">
                   {t({ id: product.title_id, en: product.title_en })}
-                </CardTitle>
-                <CardDescription className="mt-2 min-h-[60px]">
+                </h3>
+                <p className="text-muted-foreground text-sm min-h-[60px] mb-4">
                   {t({ id: product.description_id, en: product.description_en })}
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="flex-grow p-6 pt-0">
-                <ul className="space-y-2">
+                </p>
+                <ul className="space-y-2 mb-6 flex-grow">
                   {product.features_id?.map((feature: string, idx: number) => (
                     <li key={idx} className="flex items-start space-x-2 text-sm">
                       <span className="text-primary mt-0.5">✓</span>
@@ -158,8 +156,6 @@ const Products = () => {
                     </li>
                   ))}
                 </ul>
-              </CardContent>
-              <CardFooter className="p-6 pt-0">
                 <Button 
                   className="w-full min-h-[44px]"
                   onClick={() => handleOrderWhatsApp(t({ id: product.title_id, en: product.title_en }))}
@@ -167,7 +163,7 @@ const Products = () => {
                   <MessageCircle className="mr-2 h-4 w-4" />
                   {t({ id: 'Pesan Sekarang', en: 'Order Now' })}
                 </Button>
-              </CardFooter>
+              </div>
             </Card>
           ))}
         </div>
