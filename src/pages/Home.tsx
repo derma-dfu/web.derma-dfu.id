@@ -91,11 +91,16 @@ const Home = () => {
           <div className="max-w-2xl animate-fade-in">
             <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6 text-secondary leading-tight">
               {t({ 
-                id: 'Solusi Terpadu Perawatan Luka Diabetes',
-                en: 'Comprehensive Diabetic Wound Care Solution'
+                id: 'Solusi Terpadu',
+                en: 'Comprehensive'
+              })}
+              <br />
+              {t({ 
+                id: 'Perawatan Luka Diabetes',
+                en: 'Diabetic Wound Care Solution'
               })}
             </h1>
-            <p className="text-base md:text-lg text-foreground/90 mb-8 leading-relaxed">
+            <p className="text-base md:text-lg text-accent mb-8 leading-relaxed font-medium">
               {t({ 
                 id: 'Platform inovatif yang menghubungkan pasien, mitra, dan profesional kesehatan',
                 en: 'Innovative platform connecting patients, partners, and healthcare professionals'
