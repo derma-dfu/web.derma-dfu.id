@@ -15,7 +15,7 @@ const Footer = () => {
             <img 
               src={logoImage} 
               alt="DERMA-DFU.ID" 
-              className="h-10 w-auto object-contain mb-4"
+              className="h-12 w-auto object-contain mb-4"
             />
             <p className="text-secondary-foreground/80 mb-4">
               {t({ 
