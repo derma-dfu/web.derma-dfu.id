@@ -15,7 +15,31 @@ const ChatWidget = () => {
     script.innerHTML = `
       import { createChat } from 'https://cdn.jsdelivr.net/npm/@n8n/chat/dist/chat.bundle.es.js';
       createChat({
-        webhookUrl: 'https://ferri.app.n8n.cloud/webhook/3f1c6ea7-de27-4c34-b9e2-fa5409b800fd/chat'
+        webhookUrl: 'https://ferri.app.n8n.cloud/webhook/3f1c6ea7-de27-4c34-b9e2-fa5409b800fd/chat',
+        initialMessages: [
+          'Halo! 👋 Selamat datang di DERMA-DFU.ID',
+          'Saya adalah asisten virtual yang siap membantu Anda dengan informasi seputar:',
+          '• Perawatan luka kaki diabetik (Diabetic Foot Ulcer)',
+          '• Produk medis dan alat kesehatan',
+          '• Layanan teledermatologi',
+          '• Informasi kemitraan',
+          '',
+          'Silakan tanyakan apa yang ingin Anda ketahui! 😊'
+        ],
+        chatWindowOptions: {
+          title: 'DERMA-DFU Assistant',
+          subtitle: 'Asisten Virtual Perawatan Luka Diabetik',
+          primaryColor: '#e8a8c0',
+          backgroundColor: '#ffffff',
+          fontSize: '14px',
+          borderRadius: '1rem'
+        },
+        chatButtonOptions: {
+          backgroundColor: '#8fc7ea',
+          iconColor: '#ffffff',
+          borderRadius: '50%',
+          size: '60px'
+        }
       });
     `;
     document.body.appendChild(script);
