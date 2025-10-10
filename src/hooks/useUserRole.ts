@@ -12,6 +12,38 @@ export const useUserRole = () => {
   useEffect(() => {
     let mounted = true;
 
+    const fetchUserRole = async (userId: string) => {
+      console.log('Fetching user role for:', userId);
+      try {
+        const { data, error } = await supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', userId)
+          .maybeSingle();
+
+        console.log('User role fetch result:', { data, error });
+
+        if (!mounted) return;
+
+        if (error) {
+          console.error('Error fetching user role:', error);
+          setRole('user');
+          setIsLoading(false);
+        } else {
+          const userRole = data?.role as UserRole ?? 'user';
+          console.log('Setting role to:', userRole);
+          setRole(userRole);
+          setIsLoading(false);
+        }
+      } catch (error) {
+        console.error('Exception fetching user role:', error);
+        if (mounted) {
+          setRole('user');
+          setIsLoading(false);
+        }
+      }
+    };
+
     // Get initial session first
     const initAuth = async () => {
       try {
@@ -61,28 +93,6 @@ export const useUserRole = () => {
       subscription.unsubscribe();
     };
   }, []);
-
-  const fetchUserRole = async (userId: string) => {
-    try {
-      const { data, error } = await supabase
-        .from('user_roles')
-        .select('role')
-        .eq('user_id', userId)
-        .maybeSingle();
-
-      if (error) {
-        console.error('Error fetching user role:', error);
-        setRole('user'); // Default to user role
-      } else {
-        setRole(data?.role as UserRole ?? 'user');
-      }
-    } catch (error) {
-      console.error('Error fetching user role:', error);
-      setRole('user');
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   const isAdmin = role === 'admin';
   const isAuthenticated = !!user;
