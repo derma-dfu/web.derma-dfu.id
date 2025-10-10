@@ -77,7 +77,7 @@ const Home = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
             {/* Left Column - Text Content */}
             <div className="animate-fade-in">
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight" style={{ color: '#7ab8dc' }}>
+              <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6 leading-tight" style={{ color: '#7ab8dc' }}>
                 {t({ 
                   id: 'Solusi Terpadu',
                   en: 'Comprehensive'
