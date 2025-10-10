@@ -1,13 +1,21 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 
 const ChatWidget = () => {
   const location = useLocation();
   const isAdminPage = location.pathname.startsWith('/admin');
+  const chatInitialized = useRef(false);
 
   useEffect(() => {
     // Don't load chat on admin pages
-    if (isAdminPage) return;
+    if (isAdminPage) {
+      chatInitialized.current = false;
+      return;
+    }
+
+    // Prevent multiple initializations
+    if (chatInitialized.current) return;
+    chatInitialized.current = true;
 
     // Add custom CSS for n8n chat styling
     const style = document.createElement('style');
@@ -136,11 +144,21 @@ const ChatWidget = () => {
 
     // Cleanup function
     return () => {
-      if (document.body.contains(script)) {
-        document.body.removeChild(script);
-      }
-      if (document.head.contains(style)) {
-        document.head.removeChild(style);
+      // Only cleanup if explicitly on admin page
+      if (isAdminPage) {
+        if (document.body.contains(script)) {
+          document.body.removeChild(script);
+        }
+        if (document.head.contains(style)) {
+          document.head.removeChild(style);
+        }
+        chatInitialized.current = false;
+        
+        // Remove n8n chat element
+        const chatElement = document.getElementById('n8n-chat');
+        if (chatElement) {
+          chatElement.innerHTML = '';
+        }
       }
     };
   }, [isAdminPage]);
