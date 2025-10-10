@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { User } from '@supabase/supabase-js';
 
@@ -8,19 +8,21 @@ export const useUserRole = () => {
   const [user, setUser] = useState<User | null>(null);
   const [role, setRole] = useState<UserRole>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const fetchingRoleRef = useRef(false);
+  const currentUserIdRef = useRef<string | null>(null);
 
   useEffect(() => {
     let mounted = true;
-    let fetchingRole = false;
 
     const getUserRole = async (userId: string) => {
-      // Prevent multiple simultaneous fetches
-      if (fetchingRole) {
-        console.log('Role fetch already in progress, skipping...');
+      // Prevent multiple simultaneous fetches for same user
+      if (fetchingRoleRef.current && currentUserIdRef.current === userId) {
+        console.log('Role fetch already in progress for this user, skipping...');
         return;
       }
 
-      fetchingRole = true;
+      fetchingRoleRef.current = true;
+      currentUserIdRef.current = userId;
       console.log('Getting role for user:', userId);
 
       try {
@@ -31,7 +33,7 @@ export const useUserRole = () => {
           .maybeSingle();
 
         if (!mounted) {
-          fetchingRole = false;
+          fetchingRoleRef.current = false;
           return;
         }
 
@@ -43,13 +45,13 @@ export const useUserRole = () => {
           setRole((data?.role as UserRole) || 'user');
         }
         setIsLoading(false);
-        fetchingRole = false;
+        fetchingRoleRef.current = false;
       } catch (err) {
         if (mounted) {
           console.error('Role fetch exception:', err);
           setRole('user');
           setIsLoading(false);
-          fetchingRole = false;
+          fetchingRoleRef.current = false;
         }
       }
     };
@@ -69,6 +71,8 @@ export const useUserRole = () => {
           setUser(null);
           setRole(null);
           setIsLoading(false);
+          fetchingRoleRef.current = false;
+          currentUserIdRef.current = null;
         }
       } catch (err) {
         console.error('Auth init error:', err);
@@ -76,6 +80,8 @@ export const useUserRole = () => {
           setUser(null);
           setRole(null);
           setIsLoading(false);
+          fetchingRoleRef.current = false;
+          currentUserIdRef.current = null;
         }
       }
     };
@@ -89,8 +95,8 @@ export const useUserRole = () => {
 
         if (session?.user) {
           setUser(session.user);
-          // Only fetch role if we don't have it yet or user changed
-          if (!fetchingRole) {
+          // Only fetch role if not already fetching or user changed
+          if (currentUserIdRef.current !== session.user.id) {
             setIsLoading(true);
             await getUserRole(session.user.id);
           }
@@ -98,6 +104,8 @@ export const useUserRole = () => {
           setUser(null);
           setRole(null);
           setIsLoading(false);
+          fetchingRoleRef.current = false;
+          currentUserIdRef.current = null;
         }
       }
     );
