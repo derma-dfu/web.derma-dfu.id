@@ -253,7 +253,7 @@ const Partners = () => {
                 <img 
                   src={partner.logo} 
                   alt={partner.name} 
-                  className="h-20 w-auto object-contain"
+                  className="h-32 w-auto object-contain"
                 />
               </div>
             ))}
