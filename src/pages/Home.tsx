@@ -107,7 +107,7 @@ const Home = () => {
               <img 
                 src={heroImage} 
                 alt="Nurse with patient" 
-                className="w-full h-auto rounded-2xl shadow-xl"
+                className="w-full h-auto"
               />
             </div>
           </div>
