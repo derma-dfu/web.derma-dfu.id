@@ -86,12 +86,12 @@ const Home = () => {
                 en: 'Innovative platform connecting patients, partners, and healthcare professionals'
               })}
             </p>
-            <Link to="/triage">
+            <a href="https://derma-dfu.id/" target="_blank" rel="noopener noreferrer">
               <Button size="lg" className="min-h-[48px] text-lg px-8 bg-cta hover:bg-cta/90">
                 {t({ id: 'Coba Triase Sekarang', en: 'Try Triage Now' })}
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
-            </Link>
+            </a>
           </div>
         </div>
       </section>
