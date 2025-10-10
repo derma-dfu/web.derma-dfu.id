@@ -1,16 +1,19 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { Building2, Mail, Phone, FileText, CheckCircle } from 'lucide-react';
+import { Building2, Mail, Phone, FileText, CheckCircle, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 const Partners = () => {
   const { t } = useLanguage();
   const { toast } = useToast();
+  const [partners, setPartners] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   const [formData, setFormData] = useState({
     companyName: '',
     contactPerson: '',
@@ -18,6 +21,31 @@ const Partners = () => {
     phone: '',
     description: ''
   });
+
+  useEffect(() => {
+    fetchPartners();
+  }, []);
+
+  const fetchPartners = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('partners')
+        .select('*')
+        .eq('is_active', true)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setPartners(data || []);
+    } catch (error: any) {
+      toast({
+        title: t({ id: 'Error', en: 'Error' }),
+        description: error.message,
+        variant: 'destructive',
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -236,15 +264,34 @@ const Partners = () => {
           <h2 className="text-3xl font-bold text-center mb-8 text-secondary">
             {t({ id: 'Mitra Kami', en: 'Our Partners' })}
           </h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="bg-muted/30 rounded-2xl p-8 flex items-center justify-center hover-scale">
-                <p className="text-sm text-muted-foreground text-center">
-                  {t({ id: '🏢 Upload logo mitra di sini', en: '🏢 Upload partner logo here' })}
-                </p>
-              </div>
-            ))}
-          </div>
+          {loading ? (
+            <div className="flex justify-center p-8">
+              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+              {partners.length > 0 ? (
+                partners.map((partner) => (
+                  <div key={partner.id} className="bg-card rounded-2xl p-8 flex flex-col items-center justify-center hover-scale shadow-md">
+                    {partner.logo_url ? (
+                      <img 
+                        src={partner.logo_url} 
+                        alt={partner.name} 
+                        className="h-20 w-auto object-contain mb-2"
+                      />
+                    ) : (
+                      <Building2 className="h-16 w-16 text-muted-foreground mb-2" />
+                    )}
+                    <p className="text-sm font-medium text-center">{partner.name}</p>
+                  </div>
+                ))
+              ) : (
+                <div className="col-span-full text-center text-muted-foreground py-8">
+                  {t({ id: 'Belum ada mitra yang ditampilkan', en: 'No partners to display yet' })}
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </div>

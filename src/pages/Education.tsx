@@ -1,80 +1,57 @@
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { BookOpen, Video, FileText } from 'lucide-react';
+import { BookOpen, Loader2 } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
 const Education = () => {
   const { t } = useLanguage();
+  const { toast } = useToast();
+  const [articles, setArticles] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchArticles();
+  }, []);
+
+  const fetchArticles = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('articles')
+        .select('*')
+        .eq('is_published', true)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setArticles(data || []);
+    } catch (error: any) {
+      toast({
+        title: t({ id: 'Error', en: 'Error' }),
+        description: error.message,
+        variant: 'destructive',
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const categories = [
     { value: 'all', label: { id: 'Semua', en: 'All' } },
-    { value: 'basics', label: { id: 'Dasar', en: 'Basics' } },
+    { value: 'wound_care', label: { id: 'Perawatan Luka', en: 'Wound Care' } },
     { value: 'treatment', label: { id: 'Perawatan', en: 'Treatment' } },
-    { value: 'prevention', label: { id: 'Pencegahan', en: 'Prevention' } }
+    { value: 'prevention', label: { id: 'Pencegahan', en: 'Prevention' } },
+    { value: 'lifestyle', label: { id: 'Gaya Hidup', en: 'Lifestyle' } }
   ];
 
-  const articles = [
-    {
-      category: 'basics',
-      icon: <BookOpen className="h-6 w-6 text-primary" />,
-      title: { id: 'Apa itu Diabetic Foot Ulcer?', en: 'What is Diabetic Foot Ulcer?' },
-      description: { 
-        id: 'Panduan lengkap memahami luka kaki diabetes dan penyebabnya',
-        en: 'Complete guide to understanding diabetic foot ulcers and their causes'
-      },
-      readTime: '5 min'
-    },
-    {
-      category: 'treatment',
-      icon: <Video className="h-6 w-6 text-primary" />,
-      title: { id: 'Cara Merawat Luka Diabetes di Rumah', en: 'How to Care for Diabetic Wounds at Home' },
-      description: { 
-        id: 'Video tutorial perawatan luka diabetes yang aman dan efektif',
-        en: 'Video tutorial for safe and effective diabetic wound care'
-      },
-      readTime: '10 min'
-    },
-    {
-      category: 'prevention',
-      icon: <FileText className="h-6 w-6 text-primary" />,
-      title: { id: 'Mencegah Komplikasi Luka Diabetes', en: 'Preventing Diabetic Wound Complications' },
-      description: { 
-        id: 'Tips dan strategi mencegah infeksi dan komplikasi',
-        en: 'Tips and strategies to prevent infections and complications'
-      },
-      readTime: '7 min'
-    },
-    {
-      category: 'basics',
-      icon: <BookOpen className="h-6 w-6 text-primary" />,
-      title: { id: 'Tanda-tanda Bahaya Luka Kaki', en: 'Warning Signs of Foot Wounds' },
-      description: { 
-        id: 'Kenali gejala yang memerlukan penanganan medis segera',
-        en: 'Recognize symptoms that require immediate medical attention'
-      },
-      readTime: '4 min'
-    },
-    {
-      category: 'treatment',
-      icon: <Video className="h-6 w-6 text-primary" />,
-      title: { id: 'Pemilihan Pembalut yang Tepat', en: 'Choosing the Right Dressing' },
-      description: { 
-        id: 'Panduan memilih jenis pembalut sesuai kondisi luka',
-        en: 'Guide to selecting the appropriate dressing for wound conditions'
-      },
-      readTime: '6 min'
-    },
-    {
-      category: 'prevention',
-      icon: <FileText className="h-6 w-6 text-primary" />,
-      title: { id: 'Perawatan Kaki untuk Penderita Diabetes', en: 'Foot Care for Diabetes Patients' },
-      description: { 
-        id: 'Rutinitas harian untuk menjaga kesehatan kaki',
-        en: 'Daily routines to maintain foot health'
-      },
-      readTime: '8 min'
-    }
-  ];
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="h-12 w-12 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen py-12 px-4">
@@ -94,7 +71,7 @@ const Education = () => {
 
         {/* Category Tabs */}
         <Tabs defaultValue="all" className="mb-8">
-          <TabsList className="grid w-full grid-cols-4 mb-8">
+          <TabsList className="grid w-full grid-cols-5 mb-8">
             {categories.map((cat) => (
               <TabsTrigger key={cat.value} value={cat.value} className="min-h-[44px]">
                 {t(cat.label)}
@@ -108,21 +85,32 @@ const Education = () => {
                 {(cat.value === 'all' 
                   ? articles 
                   : articles.filter(a => a.category === cat.value)
-                ).map((article, index) => (
+                ).map((article) => (
                   <Card 
-                    key={index} 
+                    key={article.id} 
                     className="hover-scale rounded-2xl shadow-md cursor-pointer"
                   >
                     <CardHeader>
+                      {article.image_url && (
+                        <img 
+                          src={article.image_url} 
+                          alt={t({ id: article.title_id, en: article.title_en })} 
+                          className="w-full h-48 object-cover rounded-lg mb-4"
+                        />
+                      )}
                       <div className="flex items-center space-x-3 mb-3">
-                        {article.icon}
-                        <span className="text-sm text-muted-foreground">{article.readTime}</span>
+                        <BookOpen className="h-5 w-5 text-primary" />
+                        <span className="text-sm text-muted-foreground capitalize">{article.category.replace('_', ' ')}</span>
                       </div>
-                      <CardTitle className="text-secondary">{t(article.title)}</CardTitle>
+                      <CardTitle className="text-secondary">
+                        {t({ id: article.title_id, en: article.title_en })}
+                      </CardTitle>
                     </CardHeader>
                     <CardContent>
                       <CardDescription className="text-base">
-                        {t(article.description)}
+                        {article.excerpt_id 
+                          ? t({ id: article.excerpt_id, en: article.excerpt_en }) 
+                          : t({ id: article.content_id, en: article.content_en }).substring(0, 150) + '...'}
                       </CardDescription>
                     </CardContent>
                   </Card>

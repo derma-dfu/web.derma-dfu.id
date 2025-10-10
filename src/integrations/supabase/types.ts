@@ -14,6 +14,150 @@ export type Database = {
   }
   public: {
     Tables: {
+      articles: {
+        Row: {
+          author_id: string | null
+          category: Database["public"]["Enums"]["article_category"]
+          content_en: string
+          content_id: string
+          created_at: string | null
+          excerpt_en: string | null
+          excerpt_id: string | null
+          id: string
+          image_url: string | null
+          is_published: boolean | null
+          title_en: string
+          title_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          author_id?: string | null
+          category: Database["public"]["Enums"]["article_category"]
+          content_en: string
+          content_id: string
+          created_at?: string | null
+          excerpt_en?: string | null
+          excerpt_id?: string | null
+          id?: string
+          image_url?: string | null
+          is_published?: boolean | null
+          title_en: string
+          title_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          author_id?: string | null
+          category?: Database["public"]["Enums"]["article_category"]
+          content_en?: string
+          content_id?: string
+          created_at?: string | null
+          excerpt_en?: string | null
+          excerpt_id?: string | null
+          id?: string
+          image_url?: string | null
+          is_published?: boolean | null
+          title_en?: string
+          title_id?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      partners: {
+        Row: {
+          address: string | null
+          contact_email: string | null
+          contact_phone: string | null
+          created_at: string | null
+          description_en: string | null
+          description_id: string | null
+          id: string
+          is_active: boolean | null
+          logo_url: string | null
+          name: string
+          status: string | null
+          updated_at: string | null
+          website_url: string | null
+        }
+        Insert: {
+          address?: string | null
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string | null
+          description_en?: string | null
+          description_id?: string | null
+          id?: string
+          is_active?: boolean | null
+          logo_url?: string | null
+          name: string
+          status?: string | null
+          updated_at?: string | null
+          website_url?: string | null
+        }
+        Update: {
+          address?: string | null
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string | null
+          description_en?: string | null
+          description_id?: string | null
+          id?: string
+          is_active?: boolean | null
+          logo_url?: string | null
+          name?: string
+          status?: string | null
+          updated_at?: string | null
+          website_url?: string | null
+        }
+        Relationships: []
+      }
+      products: {
+        Row: {
+          category: Database["public"]["Enums"]["product_category"]
+          created_at: string | null
+          created_by: string | null
+          description_en: string
+          description_id: string
+          features_en: string[] | null
+          features_id: string[] | null
+          id: string
+          image_url: string | null
+          is_active: boolean | null
+          title_en: string
+          title_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          category: Database["public"]["Enums"]["product_category"]
+          created_at?: string | null
+          created_by?: string | null
+          description_en: string
+          description_id: string
+          features_en?: string[] | null
+          features_id?: string[] | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean | null
+          title_en: string
+          title_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          category?: Database["public"]["Enums"]["product_category"]
+          created_at?: string | null
+          created_by?: string | null
+          description_en?: string
+          description_id?: string
+          features_en?: string[] | null
+          features_id?: string[] | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean | null
+          title_en?: string
+          title_id?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
@@ -74,6 +218,8 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "user"
+      article_category: "wound_care" | "prevention" | "treatment" | "lifestyle"
+      product_category: "dressing" | "monitoring" | "consultation"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -202,6 +348,8 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "user"],
+      article_category: ["wound_care", "prevention", "treatment", "lifestyle"],
+      product_category: ["dressing", "monitoring", "consultation"],
     },
   },
 } as const

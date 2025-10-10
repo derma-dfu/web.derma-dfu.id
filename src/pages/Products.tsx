@@ -1,15 +1,43 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { MessageCircle } from 'lucide-react';
+import { MessageCircle, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 const Products = () => {
   const { t } = useLanguage();
   const { toast } = useToast();
   const [selectedCategory, setSelectedCategory] = useState('all');
+  const [products, setProducts] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchProducts();
+  }, []);
+
+  const fetchProducts = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('products')
+        .select('*')
+        .eq('is_active', true)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setProducts(data || []);
+    } catch (error: any) {
+      toast({
+        title: t({ id: 'Error', en: 'Error' }),
+        description: error.message,
+        variant: 'destructive',
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const categories = [
     { value: 'all', label: { id: 'Semua Produk', en: 'All Products' } },
@@ -18,82 +46,23 @@ const Products = () => {
     { value: 'consultation', label: { id: 'Konsultasi', en: 'Consultation' } }
   ];
 
-  const products = [
-    {
-      id: 1,
-      category: 'dressing',
-      title: { id: 'Pembalut Hidrokoloid Premium', en: 'Premium Hydrocolloid Dressing' },
-      description: { 
-        id: 'Pembalut canggih dengan teknologi penyerapan superior untuk luka diabetes',
-        en: 'Advanced dressing with superior absorption technology for diabetic wounds'
-      },
-      price: 'Rp 250.000',
-      image: '🩹',
-      features: [
-        { id: 'Penyerapan optimal', en: 'Optimal absorption' },
-        { id: 'Melindungi dari infeksi', en: 'Infection protection' },
-        { id: 'Mudah digunakan', en: 'Easy to use' }
-      ]
-    },
-    {
-      id: 2,
-      category: 'monitoring',
-      title: { id: 'Sistem Monitoring Digital', en: 'Digital Monitoring System' },
-      description: { 
-        id: 'Pantau perkembangan luka dengan aplikasi mobile terintegrasi',
-        en: 'Track wound progress with integrated mobile app'
-      },
-      price: 'Rp 1.500.000',
-      image: '📱',
-      features: [
-        { id: 'Tracking real-time', en: 'Real-time tracking' },
-        { id: 'Laporan lengkap', en: 'Comprehensive reports' },
-        { id: 'Notifikasi otomatis', en: 'Automatic notifications' }
-      ]
-    },
-    {
-      id: 3,
-      category: 'consultation',
-      title: { id: 'Paket Konsultasi Profesional', en: 'Professional Consultation Package' },
-      description: { 
-        id: 'Konsultasi online dengan spesialis perawatan luka bersertifikat',
-        en: 'Online consultation with certified wound care specialists'
-      },
-      price: 'Rp 500.000',
-      image: '👨‍⚕️',
-      features: [
-        { id: 'Konsultasi 30 menit', en: '30-minute consultation' },
-        { id: 'Rekomendasi perawatan', en: 'Care recommendations' },
-        { id: 'Follow-up gratis', en: 'Free follow-up' }
-      ]
-    },
-    {
-      id: 4,
-      category: 'dressing',
-      title: { id: 'Pembalut Foam Antibakteri', en: 'Antibacterial Foam Dressing' },
-      description: { 
-        id: 'Pembalut foam dengan perlindungan antibakteri untuk luka yang terinfeksi',
-        en: 'Foam dressing with antibacterial protection for infected wounds'
-      },
-      price: 'Rp 350.000',
-      image: '🧴',
-      features: [
-        { id: 'Antibakteri aktif', en: 'Active antibacterial' },
-        { id: 'Nyaman dipakai', en: 'Comfortable wear' },
-        { id: 'Tahan air', en: 'Waterproof' }
-      ]
-    }
-  ];
-
   const filteredProducts = selectedCategory === 'all' 
     ? products 
     : products.filter(p => p.category === selectedCategory);
 
-  const handleOrderWhatsApp = (productTitle: { id: string; en: string }) => {
-    const message = encodeURIComponent(`Halo, saya tertarik untuk memesan ${t(productTitle)}`);
+  const handleOrderWhatsApp = (productTitle: string) => {
+    const message = encodeURIComponent(`Halo, saya tertarik untuk memesan ${productTitle}`);
     const whatsappNumber = '6281234567890'; // Update with actual WhatsApp number
     window.open(`https://wa.me/${whatsappNumber}?text=${message}`, '_blank');
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="h-12 w-12 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen py-12 px-4">
@@ -132,16 +101,28 @@ const Products = () => {
           {filteredProducts.map((product) => (
             <Card key={product.id} className="flex flex-col rounded-2xl shadow-md hover-scale">
               <CardHeader>
-                <div className="text-6xl mb-4">{product.image}</div>
-                <CardTitle className="text-secondary">{t(product.title)}</CardTitle>
-                <CardDescription>{t(product.description)}</CardDescription>
+                {product.image_url ? (
+                  <img 
+                    src={product.image_url} 
+                    alt={t({ id: product.title_id, en: product.title_en })} 
+                    className="w-full h-48 object-cover rounded-lg mb-4"
+                  />
+                ) : (
+                  <div className="text-6xl mb-4">🩹</div>
+                )}
+                <CardTitle className="text-secondary">
+                  {t({ id: product.title_id, en: product.title_en })}
+                </CardTitle>
+                <CardDescription>
+                  {t({ id: product.description_id, en: product.description_en })}
+                </CardDescription>
               </CardHeader>
               <CardContent className="flex-grow">
                 <ul className="space-y-2">
-                  {product.features.map((feature, idx) => (
+                  {product.features_id?.map((feature: string, idx: number) => (
                     <li key={idx} className="flex items-center space-x-2 text-sm">
                       <span className="text-primary">✓</span>
-                      <span>{t(feature)}</span>
+                      <span>{t({ id: feature, en: product.features_en[idx] })}</span>
                     </li>
                   ))}
                 </ul>
@@ -149,7 +130,7 @@ const Products = () => {
               <CardFooter>
                 <Button 
                   className="w-full min-h-[44px]"
-                  onClick={() => handleOrderWhatsApp(product.title)}
+                  onClick={() => handleOrderWhatsApp(t({ id: product.title_id, en: product.title_en }))}
                 >
                   <MessageCircle className="mr-2 h-4 w-4" />
                   {t({ id: 'Pesan Sekarang', en: 'Order Now' })}
