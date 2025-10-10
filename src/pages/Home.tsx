@@ -79,10 +79,10 @@ const Home = () => {
           style={{
             backgroundImage: `url(${heroImage})`,
             backgroundSize: 'cover',
-            backgroundPosition: 'center',
+            backgroundPosition: 'right center',
           }}
         >
-          <div className="absolute inset-0 bg-gradient-to-r from-background via-background/95 to-background/60" />
+          <div className="absolute inset-0 bg-gradient-to-r from-background from-40% via-background/85 to-transparent" />
         </div>
 
         {/* Content */}
