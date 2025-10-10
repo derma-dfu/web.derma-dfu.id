@@ -7,6 +7,7 @@ import logoImage from '@/assets/logo-derma-dfu.png';
 import { supabase } from '@/integrations/supabase/client';
 import { useUserRole } from '@/hooks/useUserRole';
 import { useToast } from '@/hooks/use-toast';
+import { forceLogout } from '@/utils/forceLogout';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -105,9 +106,20 @@ const Navigation = () => {
             ))}
             
             {isLoading ? (
-              <Button variant="outline" className="min-h-[44px]" disabled>
-                {t({ id: 'Memuat...', en: 'Loading...' })}
-              </Button>
+              <div className="flex gap-2">
+                <Button variant="outline" className="min-h-[44px]" disabled>
+                  {t({ id: 'Memuat...', en: 'Loading...' })}
+                </Button>
+                <Button 
+                  variant="destructive" 
+                  size="sm"
+                  onClick={forceLogout}
+                  className="min-h-[44px]"
+                  title="Force Logout"
+                >
+                  <LogOut className="h-4 w-4" />
+                </Button>
+              </div>
             ) : isAuthenticated ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
