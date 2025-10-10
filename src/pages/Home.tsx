@@ -115,7 +115,7 @@ const Home = () => {
       </section>
 
       {/* How It Works */}
-      <section className="py-16 px-4 bg-background">
+      <section className="py-16 px-4 bg-muted/30">
         <div className="container mx-auto">
           <h2 className="text-4xl font-bold text-center mb-12 text-secondary">
             {t({ id: 'Cara Kerja', en: 'How It Works' })}
@@ -172,7 +172,7 @@ const Home = () => {
       </section>
 
       {/* Partnership Section */}
-      <section className="py-16 px-4 bg-background">
+      <section className="py-16 px-4 bg-muted/30">
         <div className="container mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
             <div>
