@@ -6,6 +6,10 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { MessageCircle, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import hydroDressing from '@/assets/products/hydrocolloid-dressing.jpg';
+import digitalMonitoring from '@/assets/products/digital-monitoring.jpg';
+import consultation from '@/assets/products/consultation-service.jpg';
+import foamDressing from '@/assets/products/foam-dressing.jpg';
 
 const Products = () => {
   const { t } = useLanguage();
@@ -60,6 +64,17 @@ const Products = () => {
     { value: 'monitoring', label: { id: 'Monitoring', en: 'Monitoring' } },
     { value: 'consultation', label: { id: 'Konsultasi', en: 'Consultation' } }
   ];
+
+  // Map product images based on title
+  const getProductImage = (titleId: string) => {
+    const imageMap: Record<string, string> = {
+      'Pembalut Hidrokoloid Premium': hydroDressing,
+      'Sistem Monitoring Digital': digitalMonitoring,
+      'Paket Konsultasi Profesional': consultation,
+      'Pembalut Foam Antibakteri': foamDressing,
+    };
+    return imageMap[titleId] || null;
+  };
 
   const filteredProducts = selectedCategory === 'all' 
     ? products 
@@ -116,9 +131,9 @@ const Products = () => {
           {filteredProducts.map((product) => (
             <Card key={product.id} className="flex flex-col rounded-2xl shadow-md hover-scale">
               <CardHeader>
-                {product.image_url ? (
+                {product.image_url || getProductImage(product.title_id) ? (
                   <img 
-                    src={product.image_url} 
+                    src={product.image_url || getProductImage(product.title_id)} 
                     alt={t({ id: product.title_id, en: product.title_en })} 
                     className="w-full h-48 object-cover rounded-lg mb-4"
                   />
