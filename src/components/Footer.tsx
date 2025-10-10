@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Mail, Phone, MapPin } from 'lucide-react';
-import logoImage from '@/assets/logo-derma-dfu.jpeg';
+import logoImage from '@/assets/logo-derma-dfu.png';
 
 const Footer = () => {
   const { t } = useLanguage();

@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Globe, Menu, X } from 'lucide-react';
 import { useState } from 'react';
-import logoImage from '@/assets/logo-derma-dfu.jpeg';
+import logoImage from '@/assets/logo-derma-dfu.png';
 
 const Navigation = () => {
   const { language, setLanguage, t } = useLanguage();
