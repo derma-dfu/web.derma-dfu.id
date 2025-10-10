@@ -2,11 +2,22 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useNavigate } from 'react-router-dom';
+import { useUserRole } from '@/hooks/useUserRole';
+import { useEffect } from 'react';
 import { ShoppingBag, Users, FileText, Settings } from 'lucide-react';
 
 const Dashboard = () => {
   const { t } = useLanguage();
   const navigate = useNavigate();
+  const { isAdmin, role, isLoading } = useUserRole();
+
+  // Redirect admin to admin page
+  useEffect(() => {
+    if (!isLoading && isAdmin) {
+      console.log('Admin detected, redirecting to /admin');
+      navigate('/admin');
+    }
+  }, [isAdmin, isLoading, navigate]);
 
   const userStats = [
     {
@@ -131,11 +142,10 @@ const Dashboard = () => {
           </Card>
         </div>
 
-        {/* Role Badge (Placeholder for future role-based features) */}
+        {/* Role Badge */}
         <div className="mt-8 p-4 bg-muted/30 rounded-2xl text-center">
           <p className="text-sm text-muted-foreground">
-            {t({ id: 'Role: Pengguna', en: 'Role: User' })} • 
-            {t({ id: ' (Dashboard untuk Mitra dan Admin akan tersedia)', en: ' (Partner and Admin dashboards coming soon)' })}
+            {t({ id: `Role: ${role === 'admin' ? 'Administrator' : 'Pengguna'}`, en: `Role: ${role === 'admin' ? 'Administrator' : 'User'}` })}
           </p>
         </div>
       </div>

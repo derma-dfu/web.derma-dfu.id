@@ -51,13 +51,30 @@ const Auth = () => {
         return;
       }
 
-      if (data.session) {
-        console.log('Login successful for:', data.user?.email);
+      if (data.session && data.user) {
+        console.log('Login successful for:', data.user.email);
+        
+        // Check user role to determine redirect
+        const { data: roleData } = await supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', data.user.id)
+          .maybeSingle();
+
+        const userRole = roleData?.role || 'user';
+        console.log('User role:', userRole);
+
         toast({
           title: t({ id: 'Login Berhasil', en: 'Login Successful' }),
           description: t({ id: 'Selamat datang kembali!', en: 'Welcome back!' }),
         });
-        navigate('/dashboard');
+
+        // Redirect based on role
+        if (userRole === 'admin') {
+          navigate('/admin');
+        } else {
+          navigate('/dashboard');
+        }
       }
     } catch (error: any) {
       console.error('Login exception:', error);
