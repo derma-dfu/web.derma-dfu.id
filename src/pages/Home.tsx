@@ -77,10 +77,15 @@ const Home = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
             {/* Left Column - Text Content */}
             <div className="animate-fade-in">
-              <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6 leading-tight" style={{ color: '#7ab8dc' }}>
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight" style={{ color: '#7ab8dc' }}>
                 {t({ 
-                  id: 'Solusi Terpadu Perawatan Luka Diabetes',
-                  en: 'Comprehensive Diabetic Wound Care Solution'
+                  id: 'Solusi Terpadu Perawatan',
+                  en: 'Comprehensive Wound'
+                })}
+                <br />
+                {t({ 
+                  id: 'Luka Diabetes',
+                  en: 'Care Solution'
                 })}
               </h1>
               <p className="text-base md:text-lg mb-8 leading-relaxed font-medium" style={{ color: '#d9738e' }}>
