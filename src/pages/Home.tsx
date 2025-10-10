@@ -100,7 +100,7 @@ const Home = () => {
                 en: 'Diabetic Wound Care Solution'
               })}
             </h1>
-            <p className="text-base md:text-lg mb-8 leading-relaxed font-medium" style={{ color: '#cda6d4' }}>
+            <p className="text-base md:text-lg mb-8 leading-relaxed font-medium" style={{ color: '#d9738e' }}>
               {t({ 
                 id: 'Platform inovatif yang menghubungkan',
                 en: 'Innovative platform connecting'
