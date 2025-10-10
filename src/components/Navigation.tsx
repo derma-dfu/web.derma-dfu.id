@@ -29,42 +29,25 @@ const Navigation = () => {
     setMobileMenuOpen(false);
     
     try {
-      console.log('Signing out from Supabase...');
-      const { error } = await supabase.auth.signOut();
+      console.log('Force clearing all auth data...');
       
-      if (error) {
-        console.error('Logout error:', error);
-        toast({
-          title: t({ id: 'Gagal keluar', en: 'Logout failed' }),
-          description: error.message,
-          variant: 'destructive',
-        });
-        return;
-      }
-      
-      console.log('Logout successful, clearing storage and redirecting...');
-      
-      // Clear all storage
+      // Don't wait for Supabase, just clear everything
       localStorage.clear();
       sessionStorage.clear();
       
-      // Success notification
-      toast({
-        title: t({ id: 'Berhasil keluar', en: 'Logged out successfully' }),
-        description: t({ id: 'Anda telah keluar dari akun', en: 'You have been logged out' }),
-      });
+      // Try to sign out but don't wait for it
+      supabase.auth.signOut().catch(err => console.error('SignOut error (ignored):', err));
       
-      // Force complete page reload to clear all state
-      setTimeout(() => {
-        window.location.href = '/';
-      }, 100);
+      console.log('Storage cleared, reloading page...');
+      
+      // Immediate reload
+      window.location.href = '/';
     } catch (error: any) {
       console.error('Logout exception:', error);
-      toast({
-        title: t({ id: 'Gagal keluar', en: 'Logout failed' }),
-        description: t({ id: 'Terjadi kesalahan', en: 'An error occurred' }),
-        variant: 'destructive',
-      });
+      // Force reload anyway
+      localStorage.clear();
+      sessionStorage.clear();
+      window.location.href = '/';
     }
   };
 
