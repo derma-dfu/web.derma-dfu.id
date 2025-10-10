@@ -17,9 +17,11 @@ import {
 const Navigation = () => {
   const { language, setLanguage, t } = useLanguage();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const { isAuthenticated, user } = useUserRole();
+  const { isAuthenticated, user, isLoading } = useUserRole();
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  console.log('Navigation render:', { isAuthenticated, userEmail: user?.email, isLoading });
 
   const handleLogout = async () => {
     setMobileMenuOpen(false);
@@ -38,16 +40,16 @@ const Navigation = () => {
         return;
       }
       
+      console.log('Logout successful, redirecting...');
+      
       // Success notification
       toast({
         title: t({ id: 'Berhasil keluar', en: 'Logged out successfully' }),
         description: t({ id: 'Anda telah keluar dari akun', en: 'You have been logged out' }),
       });
       
-      // Navigate to home and force a hard reload to clear all state
-      setTimeout(() => {
-        window.location.href = '/';
-      }, 500);
+      // Force complete page reload to clear all state
+      window.location.href = '/';
     } catch (error: any) {
       console.error('Logout error:', error);
       toast({
@@ -102,13 +104,13 @@ const Navigation = () => {
               </Link>
             ))}
             
-            {!isAuthenticated ? (
+            {!isAuthenticated && !isLoading ? (
               <Link to="/auth">
                 <Button variant="outline" className="min-h-[44px]">
                   {t({ id: 'Masuk', en: 'Login' })}
                 </Button>
               </Link>
-            ) : (
+            ) : isAuthenticated ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="outline" className="min-h-[44px]">
@@ -126,7 +128,7 @@ const Navigation = () => {
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
-            )}
+            ) : null}
             
             <Button
               variant="ghost"
@@ -165,13 +167,13 @@ const Navigation = () => {
               </Link>
             ))}
             
-            {!isAuthenticated ? (
+            {!isAuthenticated && !isLoading ? (
               <Link to="/auth" onClick={() => setMobileMenuOpen(false)}>
                 <Button variant="outline" className="w-full min-h-[44px]">
                   {t({ id: 'Masuk', en: 'Login' })}
                 </Button>
               </Link>
-            ) : (
+            ) : isAuthenticated ? (
               <>
                 <Button
                   variant="outline"
@@ -196,7 +198,7 @@ const Navigation = () => {
                   {t({ id: 'Keluar', en: 'Logout' })}
                 </Button>
               </>
-            )}
+            ) : null}
             
             <Button
               variant="ghost"
