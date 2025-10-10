@@ -79,13 +79,8 @@ const Home = () => {
             <div className="animate-fade-in">
               <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6 leading-tight" style={{ color: '#7ab8dc' }}>
                 {t({ 
-                  id: 'Solusi Terpadu',
-                  en: 'Comprehensive'
-                })}
-                <br />
-                {t({ 
-                  id: 'Perawatan Luka Diabetes',
-                  en: 'Diabetic Wound Care Solution'
+                  id: 'Solusi Terpadu Perawatan Luka Diabetes',
+                  en: 'Comprehensive Diabetic Wound Care Solution'
                 })}
               </h1>
               <p className="text-base md:text-lg mb-8 leading-relaxed font-medium" style={{ color: '#d9738e' }}>
