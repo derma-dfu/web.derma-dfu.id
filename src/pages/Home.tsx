@@ -72,41 +72,41 @@ const Home = () => {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="relative py-32 px-4 overflow-hidden min-h-[700px] flex items-center">
-        {/* Background Image with Overlay */}
-        <div 
-          className="absolute inset-0 z-0"
-          style={{
-            backgroundImage: `url(${heroImage})`,
-            backgroundSize: 'contain',
-            backgroundPosition: 'right center',
-            backgroundRepeat: 'no-repeat',
-          }}
-        >
-          <div className="absolute inset-0 bg-gradient-to-r from-background from-30% via-background/70 via-45% to-transparent" />
-        </div>
+      <section className="relative py-20 px-4 overflow-hidden bg-background">
+        <div className="container mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            {/* Left Column - Text */}
+            <div className="text-left animate-fade-in">
+              <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6 text-secondary leading-tight">
+                {t({ 
+                  id: 'Solusi Terpadu Perawatan Luka Diabetes',
+                  en: 'Comprehensive Diabetic Wound Care Solution'
+                })}
+              </h1>
+              <p className="text-base md:text-lg text-foreground/80 mb-8 leading-relaxed">
+                {t({ 
+                  id: 'Platform inovatif yang menghubungkan pasien, mitra, dan profesional kesehatan',
+                  en: 'Innovative platform connecting patients, partners, and healthcare professionals'
+                })}
+              </p>
+              <a href="https://derma-dfu.id/" target="_blank" rel="noopener noreferrer">
+                <Button size="lg" className="min-h-[56px] text-lg px-10 bg-cta hover:bg-cta/90 shadow-lg">
+                  {t({ id: 'Coba Triase Sekarang', en: 'Try Triage Now' })}
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </Button>
+              </a>
+            </div>
 
-        {/* Content */}
-        <div className="container mx-auto relative z-10">
-          <div className="max-w-2xl animate-fade-in">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-secondary leading-tight">
-              {t({ 
-                id: 'Solusi Terpadu Perawatan Luka Diabetes',
-                en: 'Comprehensive Diabetic Wound Care Solution'
-              })}
-            </h1>
-            <p className="text-lg md:text-xl text-foreground/90 mb-8 leading-relaxed">
-              {t({ 
-                id: 'Platform inovatif yang menghubungkan pasien, mitra, dan profesional kesehatan',
-                en: 'Innovative platform connecting patients, partners, and healthcare professionals'
-              })}
-            </p>
-            <a href="https://derma-dfu.id/" target="_blank" rel="noopener noreferrer">
-              <Button size="lg" className="min-h-[56px] text-lg px-10 bg-cta hover:bg-cta/90 shadow-lg">
-                {t({ id: 'Coba Triase Sekarang', en: 'Try Triage Now' })}
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
-            </a>
+            {/* Right Column - Image */}
+            <div className="relative animate-fade-in">
+              <div className="rounded-2xl overflow-hidden shadow-2xl">
+                <img 
+                  src={heroImage} 
+                  alt="Professional nurse providing diabetic foot wound care to patient"
+                  className="w-full h-auto object-cover"
+                />
+              </div>
+            </div>
           </div>
         </div>
       </section>
