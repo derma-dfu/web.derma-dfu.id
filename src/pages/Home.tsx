@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { ArrowRight, CheckCircle, Heart, Shield, Users } from 'lucide-react';
-import heroImage from '@/assets/hero-nurse-patient.png';
+import heroImage from '@/assets/hero-nurse-patient-new.png';
 
 const Home = () => {
   const { t } = useLanguage();
