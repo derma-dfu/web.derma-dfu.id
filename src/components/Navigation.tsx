@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Globe, Menu, X } from 'lucide-react';
 import { useState } from 'react';
+import logoImage from '@/assets/logo-derma-dfu.jpeg';
 
 const Navigation = () => {
   const { language, setLanguage, t } = useLanguage();
@@ -32,11 +33,12 @@ const Navigation = () => {
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
           {/* Logo */}
-          <Link to="/" className="flex items-center space-x-2">
-            <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
-              <span className="text-primary-foreground font-bold text-xl">D</span>
-            </div>
-            <span className="text-2xl font-bold text-secondary">DERMA-DFU.ID</span>
+          <Link to="/" className="flex items-center">
+            <img 
+              src={logoImage} 
+              alt="DERMA-DFU.ID" 
+              className="h-12 md:h-14 w-auto object-contain"
+            />
           </Link>
 
           {/* Desktop Navigation */}

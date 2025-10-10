@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Mail, Phone, MapPin } from 'lucide-react';
+import logoImage from '@/assets/logo-derma-dfu.jpeg';
 
 const Footer = () => {
   const { t } = useLanguage();
@@ -11,7 +12,11 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* Company Info */}
           <div>
-            <h3 className="text-xl font-bold mb-4 text-secondary-foreground">DERMA-DFU.ID</h3>
+            <img 
+              src={logoImage} 
+              alt="DERMA-DFU.ID" 
+              className="h-10 w-auto object-contain mb-4"
+            />
             <p className="text-secondary-foreground/80 mb-4">
               {t({ 
                 id: 'Platform inovatif untuk penanganan luka diabetes di Indonesia',
