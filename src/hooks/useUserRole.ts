@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { User } from '@supabase/supabase-js';
 
@@ -9,42 +9,46 @@ export const useUserRole = () => {
   const [role, setRole] = useState<UserRole>(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  const fetchUserRole = useCallback(async (userId: string) => {
+    console.log('Fetching user role for:', userId);
+    
+    // Set timeout to prevent infinite loading
+    const timeoutId = setTimeout(() => {
+      console.warn('Role fetch timeout - defaulting to user');
+      setRole('user');
+      setIsLoading(false);
+    }, 5000);
+
+    try {
+      const { data, error } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', userId)
+        .maybeSingle();
+
+      clearTimeout(timeoutId);
+      console.log('User role fetch result:', { data, error });
+
+      if (error) {
+        console.error('Error fetching user role:', error);
+        setRole('user');
+      } else {
+        const userRole = (data?.role as UserRole) ?? 'user';
+        console.log('Setting role to:', userRole);
+        setRole(userRole);
+      }
+    } catch (error) {
+      clearTimeout(timeoutId);
+      console.error('Exception fetching user role:', error);
+      setRole('user');
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
   useEffect(() => {
     let mounted = true;
 
-    const fetchUserRole = async (userId: string) => {
-      console.log('Fetching user role for:', userId);
-      try {
-        const { data, error } = await supabase
-          .from('user_roles')
-          .select('role')
-          .eq('user_id', userId)
-          .maybeSingle();
-
-        console.log('User role fetch result:', { data, error });
-
-        if (!mounted) return;
-
-        if (error) {
-          console.error('Error fetching user role:', error);
-          setRole('user');
-          setIsLoading(false);
-        } else {
-          const userRole = data?.role as UserRole ?? 'user';
-          console.log('Setting role to:', userRole);
-          setRole(userRole);
-          setIsLoading(false);
-        }
-      } catch (error) {
-        console.error('Exception fetching user role:', error);
-        if (mounted) {
-          setRole('user');
-          setIsLoading(false);
-        }
-      }
-    };
-
-    // Get initial session first
     const initAuth = async () => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
@@ -68,7 +72,6 @@ export const useUserRole = () => {
       }
     };
 
-    // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         if (!mounted) return;
@@ -92,7 +95,7 @@ export const useUserRole = () => {
       mounted = false;
       subscription.unsubscribe();
     };
-  }, []);
+  }, [fetchUserRole]);
 
   const isAdmin = role === 'admin';
   const isAuthenticated = !!user;
