@@ -83,7 +83,7 @@ const Home = () => {
             backgroundRepeat: 'no-repeat',
           }}
         >
-          <div className="absolute inset-0 bg-gradient-to-r from-background from-50% via-background/90 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-r from-background from-30% via-background/70 via-45% to-transparent" />
         </div>
 
         {/* Content */}
