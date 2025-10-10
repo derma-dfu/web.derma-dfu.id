@@ -100,10 +100,15 @@ const Home = () => {
                 en: 'Diabetic Wound Care Solution'
               })}
             </h1>
-            <p className="text-base md:text-lg text-accent mb-8 leading-relaxed font-medium">
+            <p className="text-base md:text-lg mb-8 leading-relaxed font-medium" style={{ color: '#cda6d4' }}>
               {t({ 
-                id: 'Platform inovatif yang menghubungkan pasien, mitra, dan profesional kesehatan',
-                en: 'Innovative platform connecting patients, partners, and healthcare professionals'
+                id: 'Platform inovatif yang menghubungkan',
+                en: 'Innovative platform connecting'
+              })}
+              <br />
+              {t({ 
+                id: 'pasien, mitra, dan profesional kesehatan',
+                en: 'patients, partners, and healthcare professionals'
               })}
             </p>
             <a href="https://derma-dfu.id/" target="_blank" rel="noopener noreferrer">
