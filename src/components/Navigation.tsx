@@ -29,24 +29,18 @@ const Navigation = () => {
     setMobileMenuOpen(false);
     
     try {
-      console.log('Force clearing all auth data...');
+      console.log('Signing out from Supabase...');
       
-      // Don't wait for Supabase, just clear everything
-      localStorage.clear();
-      sessionStorage.clear();
+      // Sign out properly from Supabase
+      await supabase.auth.signOut();
       
-      // Try to sign out but don't wait for it
-      supabase.auth.signOut().catch(err => console.error('SignOut error (ignored):', err));
+      console.log('Sign out complete, reloading...');
       
-      console.log('Storage cleared, reloading page...');
-      
-      // Immediate reload
+      // Reload to clear React state
       window.location.href = '/';
     } catch (error: any) {
-      console.error('Logout exception:', error);
+      console.error('Logout error:', error);
       // Force reload anyway
-      localStorage.clear();
-      sessionStorage.clear();
       window.location.href = '/';
     }
   };

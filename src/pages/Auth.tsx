@@ -33,13 +33,16 @@ const Auth = () => {
     e.preventDefault();
     setIsLoading(true);
 
+    console.log('Attempting login for:', loginData.email);
+
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
-        email: loginData.email,
+        email: loginData.email.trim(),
         password: loginData.password,
       });
 
       if (error) {
+        console.error('Login error:', error);
         toast({
           title: t({ id: 'Login Gagal', en: 'Login Failed' }),
           description: error.message,
@@ -49,13 +52,15 @@ const Auth = () => {
       }
 
       if (data.session) {
+        console.log('Login successful for:', data.user?.email);
         toast({
           title: t({ id: 'Login Berhasil', en: 'Login Successful' }),
           description: t({ id: 'Selamat datang kembali!', en: 'Welcome back!' }),
         });
         navigate('/dashboard');
       }
-    } catch (error) {
+    } catch (error: any) {
+      console.error('Login exception:', error);
       toast({
         title: t({ id: 'Error', en: 'Error' }),
         description: t({ id: 'Terjadi kesalahan', en: 'An error occurred' }),
