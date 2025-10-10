@@ -20,24 +20,24 @@ All colors MUST be HSL.
     --popover: 0 0% 100%;
     --popover-foreground: 220 26% 14%;
     
-    /* Primary - Green #00C853 */
-    --primary: 145 100% 39%;
+    /* Primary - Pink #cda6d4 */
+    --primary: 291 36% 74%;
     --primary-foreground: 0 0% 100%;
     
-    /* Secondary - Navy #0B3A82 for headings */
+    /* Secondary - Navy for headings */
     --secondary: 214 84% 28%;
     --secondary-foreground: 0 0% 100%;
     
-    /* Muted colors */
-    --muted: 210 40% 96%;
+    /* Muted colors - using light blue tint */
+    --muted: 184 62% 96%;
     --muted-foreground: 215 16% 47%;
     
-    /* Accent - Light Blue #0EA5E9 */
-    --accent: 199 89% 48%;
-    --accent-foreground: 0 0% 100%;
+    /* Accent - Blue #d4f2f4 */
+    --accent: 184 62% 89%;
+    --accent-foreground: 220 26% 14%;
     
-    /* CTA - Blue #2563EB */
-    --cta: 221 83% 53%;
+    /* CTA - Darker Pink */
+    --cta: 291 36% 60%;
     --cta-foreground: 0 0% 100%;
     
     /* Warning - Orange #F59E0B */
@@ -48,13 +48,13 @@ All colors MUST be HSL.
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
     
-    /* Pink hearts - #FF2D87 */
-    --hearts: 335 100% 59%;
+    /* Pink hearts - #cda6d4 */
+    --hearts: 291 36% 74%;
     
-    /* Border and input */
-    --border: 214 32% 91%;
-    --input: 214 32% 91%;
-    --ring: 145 100% 39%;
+    /* Border and input - light blue tint */
+    --border: 184 40% 91%;
+    --input: 184 40% 91%;
+    --ring: 291 36% 74%;
     
     /* Radius - rounded-2xl */
     --radius: 1rem;
