@@ -130,34 +130,36 @@ const Products = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredProducts.map((product) => (
             <Card key={product.id} className="flex flex-col rounded-2xl shadow-md hover-scale">
-              <CardHeader>
+              <CardHeader className="p-6">
                 {product.image_url || getProductImage(product.title_id) ? (
-                  <img 
-                    src={product.image_url || getProductImage(product.title_id)} 
-                    alt={t({ id: product.title_id, en: product.title_en })} 
-                    className="w-full h-48 object-cover rounded-lg mb-4"
-                  />
+                  <div className="w-full h-48 mb-4 overflow-hidden rounded-lg">
+                    <img 
+                      src={product.image_url || getProductImage(product.title_id)} 
+                      alt={t({ id: product.title_id, en: product.title_en })} 
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
                 ) : (
-                  <div className="text-6xl mb-4">🩹</div>
+                  <div className="text-6xl mb-4 text-center">🩹</div>
                 )}
-                <CardTitle className="text-secondary">
+                <CardTitle className="text-secondary text-xl min-h-[56px] flex items-center">
                   {t({ id: product.title_id, en: product.title_en })}
                 </CardTitle>
-                <CardDescription>
+                <CardDescription className="mt-2 min-h-[60px]">
                   {t({ id: product.description_id, en: product.description_en })}
                 </CardDescription>
               </CardHeader>
-              <CardContent className="flex-grow">
+              <CardContent className="flex-grow p-6 pt-0">
                 <ul className="space-y-2">
                   {product.features_id?.map((feature: string, idx: number) => (
-                    <li key={idx} className="flex items-center space-x-2 text-sm">
-                      <span className="text-primary">✓</span>
+                    <li key={idx} className="flex items-start space-x-2 text-sm">
+                      <span className="text-primary mt-0.5">✓</span>
                       <span>{t({ id: feature, en: product.features_en[idx] })}</span>
                     </li>
                   ))}
                 </ul>
               </CardContent>
-              <CardFooter>
+              <CardFooter className="p-6 pt-0">
                 <Button 
                   className="w-full min-h-[44px]"
                   onClick={() => handleOrderWhatsApp(t({ id: product.title_id, en: product.title_en }))}
