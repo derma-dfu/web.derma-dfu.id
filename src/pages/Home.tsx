@@ -134,13 +134,13 @@ const Home = () => {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {products.map((product, index) => (
-              <Card key={index} className="hover-scale rounded-2xl shadow-md">
+              <Card key={index} className="hover-scale rounded-2xl shadow-md flex flex-col">
                 <CardHeader>
                   <div className="text-6xl mb-4">{product.image}</div>
                   <CardTitle className="text-secondary">{t(product.title)}</CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <CardDescription className="text-base">{t(product.description)}</CardDescription>
+                <CardContent className="flex-grow flex flex-col">
+                  <CardDescription className="text-base flex-grow">{t(product.description)}</CardDescription>
                   <Link to="/products">
                     <Button className="mt-4 w-full min-h-[44px]">
                       {t({ id: 'Pelajari Lebih Lanjut', en: 'Learn More' })}
