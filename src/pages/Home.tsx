@@ -89,7 +89,7 @@ const Home = () => {
         {/* Content */}
         <div className="container mx-auto relative z-10">
           <div className="max-w-2xl animate-fade-in">
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6 text-secondary leading-tight">
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6 text-foreground leading-tight">
               {t({ 
                 id: 'Solusi Terpadu',
                 en: 'Comprehensive'
