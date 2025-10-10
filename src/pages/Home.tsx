@@ -87,7 +87,7 @@ const Home = () => {
         {/* Content */}
         <div className="container mx-auto relative z-10">
           <div className="max-w-xl animate-fade-in">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight" style={{ color: '#7ab8dc' }}>
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6 leading-tight" style={{ color: '#7ab8dc' }}>
               {t({ 
                 id: 'Solusi Terpadu',
                 en: 'Comprehensive'
