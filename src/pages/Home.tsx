@@ -2,8 +2,9 @@ import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { ArrowRight, CheckCircle, Heart, Shield, Users } from 'lucide-react';
+import { ArrowRight, CheckCircle, Heart, Shield, Users, Calendar, Clock, Video, ExternalLink } from 'lucide-react';
 import heroImage from '@/assets/hero-nurse-patient-new.png';
+import webinarPoster from '@/assets/webinar-dfu-poster.jpg';
 
 const Home = () => {
   const { t } = useLanguage();
@@ -109,6 +110,82 @@ const Home = () => {
                 alt="Nurse with patient" 
                 className="w-full h-auto scale-110"
               />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Webinar Promotion Section */}
+      <section className="py-12 px-4 bg-gradient-to-r from-primary/10 via-accent/10 to-primary/10">
+        <div className="container mx-auto">
+          <div className="bg-card rounded-2xl shadow-xl overflow-hidden">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-0">
+              {/* Poster Image */}
+              <div className="relative">
+                <img 
+                  src={webinarPoster} 
+                  alt="Webinar Diabetic Foot Ulcer" 
+                  className="w-full h-full object-cover min-h-[300px]"
+                />
+                <div className="absolute top-4 left-4">
+                  <span className="bg-cta text-cta-foreground px-4 py-2 rounded-full text-sm font-bold uppercase tracking-wide shadow-lg">
+                    GRATIS
+                  </span>
+                </div>
+              </div>
+              
+              {/* Content */}
+              <div className="p-8 flex flex-col justify-center">
+                <div className="mb-4">
+                  <span className="text-primary font-semibold text-sm uppercase tracking-wide">
+                    ✨ Webinar Gratis
+                  </span>
+                </div>
+                <h3 className="text-2xl md:text-3xl font-bold text-secondary mb-4 leading-tight">
+                  Inovasi Terkini Penanganan Diabetic Foot Ulcer (DFU)
+                </h3>
+                <p className="text-foreground/70 mb-6 text-sm leading-relaxed">
+                  Webinar ini bertujuan memberikan pemahaman terbaru tentang pencegahan luka kaki diabetik, 
+                  deteksi dini DFU, inovasi terbaru dalam penanganan luka & teknologi kesehatan, 
+                  serta pendekatan klinis oleh para dokter spesialis.
+                </p>
+                
+                <div className="flex flex-wrap gap-4 mb-6 text-sm">
+                  <div className="flex items-center gap-2 text-foreground/80">
+                    <Calendar className="h-4 w-4 text-primary" />
+                    <span>Kamis, 11 Desember 2025</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-foreground/80">
+                    <Clock className="h-4 w-4 text-primary" />
+                    <span>13.00 – 16.00 WIB</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-foreground/80">
+                    <Video className="h-4 w-4 text-primary" />
+                    <span>Via Zoom</span>
+                  </div>
+                </div>
+
+                <div className="mb-6 p-4 bg-muted/50 rounded-lg">
+                  <p className="text-xs text-foreground/60 mb-2 font-medium">Narasumber:</p>
+                  <ul className="text-sm text-foreground/80 space-y-1">
+                    <li>• dr. Andrew Suprayogi, Sp.PD., M.M., FINASIM</li>
+                    <li>• Dr. dr. Reza Y Purwoko, Sp.DVE., FINSDV., FAADV</li>
+                  </ul>
+                  <p className="text-xs text-foreground/60 mt-2">Moderator: dr. Sonia Wibisono</p>
+                </div>
+                
+                <a 
+                  href="https://bit.ly/PendaftaranWebinarDFU" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="inline-block"
+                >
+                  <Button size="lg" className="min-h-[52px] text-base px-8 bg-cta hover:bg-cta/90 shadow-lg group">
+                    Daftar Sekarang
+                    <ExternalLink className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                  </Button>
+                </a>
+              </div>
             </div>
           </div>
         </div>
