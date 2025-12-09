@@ -1,21 +1,21 @@
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 
 const ChatWidget = () => {
   const location = useLocation();
   const isAdminPage = location.pathname.startsWith('/admin');
-  const chatInitialized = useRef(false);
 
   useEffect(() => {
     // Don't load chat on admin pages
     if (isAdminPage) {
-      chatInitialized.current = false;
       return;
     }
 
-    // Prevent multiple initializations
-    if (chatInitialized.current) return;
-    chatInitialized.current = true;
+    // Check if script already exists
+    const existingScript = document.getElementById('chatbot-iframe');
+    if (existingScript) {
+      return;
+    }
 
     // Load the Estha AI chatbot script
     const script = document.createElement('script');
@@ -24,21 +24,22 @@ const ChatWidget = () => {
     script.setAttribute('data-bot-src', 'https://studio.estha.ai/app/693844e89d9a8a600ad72909');
     script.setAttribute('data-bot-width', '375px');
     script.setAttribute('data-bot-height', '667px');
+    script.async = true;
     document.body.appendChild(script);
 
     // Cleanup function
     return () => {
-      if (isAdminPage) {
-        const existingScript = document.getElementById('chatbot-iframe');
-        if (existingScript) {
-          document.body.removeChild(existingScript);
-        }
-        chatInitialized.current = false;
+      const scriptToRemove = document.getElementById('chatbot-iframe');
+      if (scriptToRemove && scriptToRemove.parentNode) {
+        scriptToRemove.parentNode.removeChild(scriptToRemove);
       }
+      // Also remove any iframe that might have been created
+      const chatbotIframes = document.querySelectorAll('iframe[src*="estha.ai"]');
+      chatbotIframes.forEach(iframe => iframe.remove());
     };
   }, [isAdminPage]);
 
-  // Don't render anything on admin pages
+  // Don't render anything - the script handles everything
   if (isAdminPage) return null;
   
   return null;
