@@ -10,6 +10,7 @@ import hydroDressing from '@/assets/products/hydrocolloid-dressing.jpg';
 import digitalMonitoring from '@/assets/products/digital-monitoring.jpg';
 import consultation from '@/assets/products/consultation-service.jpg';
 import foamDressing from '@/assets/products/foam-dressing.jpg';
+import sepatuCtev from '@/assets/products/sepatu-ctev.png';
 
 const Products = () => {
   const { t } = useLanguage();
@@ -72,6 +73,7 @@ const Products = () => {
       'Sistem Monitoring Digital': digitalMonitoring,
       'Paket Konsultasi Profesional': consultation,
       'Pembalut Foam Antibakteri': foamDressing,
+      'Sepatu CTEV': sepatuCtev,
     };
     return imageMap[titleId] || null;
   };
