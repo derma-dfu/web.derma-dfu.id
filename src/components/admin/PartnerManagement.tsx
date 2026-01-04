@@ -6,9 +6,15 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, Plus, Edit, Trash2 } from 'lucide-react';
+import {
+  Loading03Icon,
+  Add01Icon,
+  Edit02Icon,
+  Delete02Icon
+} from 'hugeicons-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Switch } from '@/components/ui/switch';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface Partner {
   id: string;
@@ -25,6 +31,7 @@ interface Partner {
 }
 
 export const PartnerManagement = () => {
+  const { t } = useLanguage();
   const [partners, setPartners] = useState<Partner[]>([]);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -56,7 +63,7 @@ export const PartnerManagement = () => {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setPartners(data || []);
+      setPartners((data as any) || []);
     } catch (error: any) {
       toast({
         title: 'Error',
@@ -103,7 +110,7 @@ export const PartnerManagement = () => {
 
   const handleSubmit = async (e: React.FormEvent, logoUrl?: string) => {
     e.preventDefault();
-    
+
     try {
       const partnerData = {
         name: formData.name,
@@ -200,23 +207,28 @@ export const PartnerManagement = () => {
   };
 
   if (loading) {
-    return <div className="flex justify-center p-8"><Loader2 className="h-8 w-8 animate-spin" /></div>;
+    return <div className="flex justify-center p-8"><Loading03Icon className="h-8 w-8 animate-spin" /></div>;
   }
 
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold">Partner Management</h2>
+        {/* Title removed, handled by layout */}
+        <div className="flex-1"></div>
         <Dialog open={dialogOpen} onOpenChange={(open) => {
           setDialogOpen(open);
           if (!open) resetForm();
         }}>
           <DialogTrigger asChild>
-            <Button><Plus className="mr-2 h-4 w-4" /> Add Partner</Button>
+            <Button><Add01Icon className="mr-2 h-4 w-4" /> {t({ id: 'Tambah Mitra', en: 'Add Partner' })}</Button>
           </DialogTrigger>
           <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle>{editingPartner ? 'Edit Partner' : 'Add New Partner'}</DialogTitle>
+              <DialogTitle>
+                {editingPartner
+                  ? t({ id: 'Edit Mitra', en: 'Edit Partner' })
+                  : t({ id: 'Tambah Mitra Baru', en: 'Add New Partner' })}
+              </DialogTitle>
             </DialogHeader>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
@@ -244,7 +256,7 @@ export const PartnerManagement = () => {
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <Label>Website URL</Label>
                   <Input
@@ -263,7 +275,7 @@ export const PartnerManagement = () => {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <Label>Contact Phone</Label>
                   <Input
@@ -304,7 +316,7 @@ export const PartnerManagement = () => {
               </div>
 
               <Button type="submit" disabled={uploading}>
-                {uploading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                {uploading && <Loading03Icon className="mr-2 h-4 w-4 animate-spin" />}
                 {editingPartner ? 'Update' : 'Create'}
               </Button>
             </form>
@@ -328,10 +340,10 @@ export const PartnerManagement = () => {
                 </div>
                 <div className="flex gap-2">
                   <Button variant="outline" size="sm" onClick={() => openEditDialog(partner)}>
-                    <Edit className="h-4 w-4" />
+                    <Edit02Icon className="h-4 w-4" />
                   </Button>
                   <Button variant="destructive" size="sm" onClick={() => handleDelete(partner.id)}>
-                    <Trash2 className="h-4 w-4" />
+                    <Delete02Icon className="h-4 w-4" />
                   </Button>
                 </div>
               </div>

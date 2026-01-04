@@ -1,9 +1,11 @@
+"use client";
+
 import { useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import { usePathname } from 'next/navigation';
 
 const ChatWidget = () => {
-  const location = useLocation();
-  const isAdminPage = location.pathname.startsWith('/admin');
+  const pathname = usePathname();
+  const isAdminPage = pathname?.startsWith('/admin');
 
   useEffect(() => {
     // Don't load chat on admin pages
@@ -41,7 +43,7 @@ const ChatWidget = () => {
 
   // Don't render anything - the script handles everything
   if (isAdminPage) return null;
-  
+
   return null;
 };
 

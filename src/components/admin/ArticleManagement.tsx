@@ -7,9 +7,15 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, Plus, Edit, Trash2 } from 'lucide-react';
+import {
+  Loading03Icon,
+  Add01Icon,
+  Edit02Icon,
+  Delete02Icon
+} from 'hugeicons-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Switch } from '@/components/ui/switch';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface Article {
   id: string;
@@ -25,6 +31,7 @@ interface Article {
 }
 
 export const ArticleManagement = () => {
+  const { t } = useLanguage();
   const [articles, setArticles] = useState<Article[]>([]);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -55,7 +62,7 @@ export const ArticleManagement = () => {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setArticles(data || []);
+      setArticles((data as any) || []);
     } catch (error: any) {
       toast({
         title: 'Error',
@@ -102,7 +109,7 @@ export const ArticleManagement = () => {
 
   const handleSubmit = async (e: React.FormEvent, imageUrl?: string) => {
     e.preventDefault();
-    
+
     try {
       const articleData = {
         title_id: formData.title_id,
@@ -196,26 +203,31 @@ export const ArticleManagement = () => {
   };
 
   if (loading) {
-    return <div className="flex justify-center p-8"><Loader2 className="h-8 w-8 animate-spin" /></div>;
+    return <div className="flex justify-center p-8"><Loading03Icon className="h-8 w-8 animate-spin" /></div>;
   }
 
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold">Article Management</h2>
+        {/* Title removed, handled by layout */}
+        <div className="flex-1"></div>
         <Dialog open={dialogOpen} onOpenChange={(open) => {
           setDialogOpen(open);
           if (!open) resetForm();
         }}>
           <DialogTrigger asChild>
-            <Button><Plus className="mr-2 h-4 w-4" /> Add Article</Button>
+            <Button><Add01Icon className="mr-2 h-4 w-4" /> {t({ id: 'Tambah Artikel', en: 'Add Article' })}</Button>
           </DialogTrigger>
           <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle>{editingArticle ? 'Edit Article' : 'Add New Article'}</DialogTitle>
+              <DialogTitle>
+                {editingArticle
+                  ? t({ id: 'Edit Artikel', en: 'Edit Article' })
+                  : t({ id: 'Tambah Artikel Baru', en: 'Add New Article' })}
+              </DialogTitle>
             </DialogHeader>
             <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <Label>Title (ID)</Label>
                   <Input
@@ -254,7 +266,7 @@ export const ArticleManagement = () => {
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <Label>Excerpt (ID)</Label>
                   <Textarea
@@ -310,7 +322,7 @@ export const ArticleManagement = () => {
               </div>
 
               <Button type="submit" disabled={uploading}>
-                {uploading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                {uploading && <Loading03Icon className="mr-2 h-4 w-4 animate-spin" />}
                 {editingArticle ? 'Update' : 'Create'}
               </Button>
             </form>
@@ -329,10 +341,10 @@ export const ArticleManagement = () => {
                 </div>
                 <div className="flex gap-2">
                   <Button variant="outline" size="sm" onClick={() => openEditDialog(article)}>
-                    <Edit className="h-4 w-4" />
+                    <Edit02Icon className="h-4 w-4" />
                   </Button>
                   <Button variant="destructive" size="sm" onClick={() => handleDelete(article.id)}>
-                    <Trash2 className="h-4 w-4" />
+                    <Delete02Icon className="h-4 w-4" />
                   </Button>
                 </div>
               </div>

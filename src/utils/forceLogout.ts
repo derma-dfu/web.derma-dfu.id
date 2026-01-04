@@ -5,39 +5,49 @@ import { supabase } from '@/integrations/supabase/client';
  * Use this as emergency logout when normal logout doesn't work
  */
 export const forceLogout = () => {
+  if (typeof window === 'undefined') return;
+
   console.log('Force logout initiated - signing out and clearing auth data');
-  
+
   // Start signOut but don't wait for it
   supabase.auth.signOut().catch(err => console.log('SignOut error (ignored):', err));
-  
+
   // Immediately clear ALL auth-related items from localStorage
   const keysToRemove: string[] = [];
-  for (let i = 0; i < localStorage.length; i++) {
-    const key = localStorage.key(i);
-    if (key && (
-      key.includes('supabase.auth') || 
-      key.includes('sb-') ||
-      key.startsWith('supabase-auth')
-    )) {
-      keysToRemove.push(key);
+  try {
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key && (
+        key.includes('supabase.auth') ||
+        key.includes('sb-') ||
+        key.startsWith('supabase-auth')
+      )) {
+        keysToRemove.push(key);
+      }
     }
+  } catch (e) {
+    console.warn('Error accessing localStorage', e);
   }
-  
+
   console.log('Removing auth keys:', keysToRemove);
   keysToRemove.forEach(key => {
     localStorage.removeItem(key);
   });
-  
+
   // Clear sessionStorage
-  sessionStorage.clear();
-  
+  try {
+    sessionStorage.clear();
+  } catch (e) {
+    console.warn('Error clearing sessionStorage', e);
+  }
+
   // Clear all cookies (backup)
-  document.cookie.split(";").forEach(function(c) { 
-    document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); 
+  document.cookie.split(";").forEach(function (c) {
+    document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
   });
-  
+
   console.log('Force logout complete - reloading immediately');
-  
+
   // Use setTimeout 0 to ensure storage is cleared before reload
   setTimeout(() => {
     window.location.replace('/');
