@@ -53,7 +53,7 @@ const Cart = () => {
     const [showShippingForm, setShowShippingForm] = useState(false);
 
     useEffect(() => {
-        // eslint-disable-next-line react-hooks/set-state-in-effect
+        // eslint-disable-next-line react-hooks/exhaustive-deps
         setMounted(true);
 
         // Load cart items from localStorage
@@ -61,7 +61,6 @@ const Cart = () => {
         if (savedCart) {
             try {
                 const items = JSON.parse(savedCart);
-                // eslint-disable-next-line react-hooks/set-state-in-effect
                 setCartItems(items);
             } catch (e) {
                 console.error('Failed to parse cart items', e);
@@ -72,9 +71,7 @@ const Cart = () => {
         const checkUser = async () => {
             const { data: { session } } = await supabase.auth.getSession();
             if (session?.user) {
-                // eslint-disable-next-line react-hooks/set-state-in-effect
                 setUser(session.user);
-                // eslint-disable-next-line react-hooks/set-state-in-effect
                 setShippingForm(prev => ({
                     ...prev,
                     name: session.user.user_metadata?.name || '',

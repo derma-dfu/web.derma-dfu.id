@@ -41,7 +41,6 @@ const Dashboard = () => {
     const [userName, setUserName] = useState('');
 
     useEffect(() => {
-        // eslint-disable-next-line react-hooks/set-state-in-effect
         setMounted(true);
 
         // Load cart items count from localStorage
@@ -49,7 +48,6 @@ const Dashboard = () => {
         if (savedCart) {
             try {
                 const items = JSON.parse(savedCart);
-                // eslint-disable-next-line react-hooks/set-state-in-effect
                 setCartItemCount(items.length);
             } catch (e) {
                 console.error('Failed to parse cart items', e);
@@ -69,7 +67,6 @@ const Dashboard = () => {
                 // Get user name from session metadata (avoiding typed table issue)
                 const { data: { session } } = await supabase.auth.getSession();
                 if (session?.user) {
-                    // eslint-disable-next-line react-hooks/set-state-in-effect
                     setUserName(session.user.user_metadata?.name || session.user.email?.split('@')[0] || '');
                 }
 
@@ -97,16 +94,13 @@ const Dashboard = () => {
                         ...order,
                         order_items: itemsData?.filter((item: any) => item.order_id === order.id) || []
                     }));
-                    // eslint-disable-next-line react-hooks/set-state-in-effect
                     setOrders(ordersWithItems);
                 } else {
-                    // eslint-disable-next-line react-hooks/set-state-in-effect
                     setOrders([]);
                 }
             } catch (error) {
                 console.error('Error fetching orders:', error);
             } finally {
-                // eslint-disable-next-line react-hooks/set-state-in-effect
                 setOrdersLoading(false);
             }
         };

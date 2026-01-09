@@ -8,14 +8,15 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { Tick02Icon, ShoppingCart01Icon } from 'hugeicons-react';
 import Link from 'next/link';
 
-export default function PaymentSuccess() {
+import { Suspense } from 'react';
+
+function PaymentSuccessContent() {
     const { t } = useLanguage();
     const searchParams = useSearchParams();
     const orderId = searchParams.get('order_id');
     const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
-        // eslint-disable-next-line react-hooks/set-state-in-effect
         setMounted(true);
 
         // Clear cart after successful payment
@@ -82,5 +83,13 @@ export default function PaymentSuccess() {
                 </CardContent>
             </Card>
         </div>
+    );
+}
+
+export default function PaymentSuccess() {
+    return (
+        <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div></div>}>
+            <PaymentSuccessContent />
+        </Suspense>
     );
 }
