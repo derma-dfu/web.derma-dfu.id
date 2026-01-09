@@ -101,7 +101,7 @@ export async function POST(request: NextRequest) {
 
         // 4. Create order in database
         const orderId = crypto.randomUUID();
-        console.log("Creating order:", { orderId, userId: user.id, totalAmount });
+        // console.log("Creating order:", { orderId, userId: user.id, totalAmount });
 
         const { error: orderError } = await supabaseAdmin
             .from("orders")

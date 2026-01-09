@@ -62,11 +62,11 @@ export async function middleware(request: NextRequest) {
             return NextResponse.redirect(new URL('/auth', request.url))
         }
 
-        // Optional: Check for admin role in metadata
-        // const role = session.user.user_metadata.role
-        // if (role !== 'admin') {
-        //   return NextResponse.redirect(new URL('/', request.url))
-        // }
+        // Check for admin role in metadata
+        const role = session.user.user_metadata.role
+        if (role !== 'admin') {
+            return NextResponse.redirect(new URL('/', request.url))
+        }
     }
 
     // Protected Cart/Payment Routes? (Optional, maybe allow guest checkout?)

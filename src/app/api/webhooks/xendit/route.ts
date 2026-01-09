@@ -37,12 +37,12 @@ export async function POST(request: NextRequest) {
         // 2. Parse webhook payload
         const payload: XenditWebhookPayload = await request.json();
 
-        console.log("Xendit webhook received:", {
-            id: payload.id,
-            external_id: payload.external_id,
-            status: payload.status,
-            amount: payload.amount
-        });
+        // console.log("Xendit webhook received:", {
+        //     id: payload.id,
+        //     external_id: payload.external_id,
+        //     status: payload.status,
+        //     amount: payload.amount
+        // });
 
         // 3. Handle different invoice statuses
         switch (payload.status) {
