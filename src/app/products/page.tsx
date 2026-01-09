@@ -27,7 +27,7 @@ const Products = () => {
     const router = useRouter();
     const [selectedCategory, setSelectedCategory] = useState('all');
     const [products, setProducts] = useState<any[]>([]);
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -67,7 +67,7 @@ const Products = () => {
         return () => {
             mounted = false;
         };
-    }, []); // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [t, toast]);
 
 
     const categories = [

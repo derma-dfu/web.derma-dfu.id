@@ -76,6 +76,8 @@ export const DoctorManagement = () => {
     const [editingId, setEditingId] = useState<string | null>(null);
     const [tempCredential, setTempCredential] = useState("");
 
+    const [refreshKey, setRefreshKey] = useState(0);
+
     // Fetch Doctors - Defined inside useEffect to avoid dependency issues
     useEffect(() => {
         const fetchDoctors = async () => {
@@ -98,7 +100,7 @@ export const DoctorManagement = () => {
         };
 
         fetchDoctors();
-    }, [toast]);
+    }, [refreshKey, toast]);
 
     // Handle Image Upload
     const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -175,7 +177,7 @@ export const DoctorManagement = () => {
                 description: `Doctor ${editingId ? "updated" : "added"} successfully.`,
             });
             setIsDialogOpen(false);
-            fetchDoctors();
+            setRefreshKey(prev => prev + 1);
             resetForm();
         }
         setIsSubmitting(false);
@@ -200,7 +202,7 @@ export const DoctorManagement = () => {
                 title: "Deleted",
                 description: "Doctor deleted successfully.",
             });
-            fetchDoctors();
+            setRefreshKey(prev => prev + 1);
         }
     };
 

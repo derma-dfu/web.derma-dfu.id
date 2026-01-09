@@ -82,6 +82,8 @@ export const WebinarManagement = () => {
     const [editingId, setEditingId] = useState<string | null>(null);
     const [tempSpeaker, setTempSpeaker] = useState<Speaker>({ name: "", role: "" });
 
+    const [refreshKey, setRefreshKey] = useState(0);
+
     // Fetch Webinars
     useEffect(() => {
         const fetchWebinars = async () => {
@@ -109,7 +111,7 @@ export const WebinarManagement = () => {
         };
 
         fetchWebinars();
-    }, [toast]);
+    }, [refreshKey, toast]);
 
     // Handle Image Upload
     const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -185,7 +187,7 @@ export const WebinarManagement = () => {
                 description: `Webinar ${editingId ? "updated" : "created"} successfully.`,
             });
             setIsDialogOpen(false);
-            fetchWebinars();
+            setRefreshKey(prev => prev + 1);
             resetForm();
         }
         setIsSubmitting(false);
@@ -210,7 +212,7 @@ export const WebinarManagement = () => {
                 title: "Deleted",
                 description: "Webinar deleted successfully.",
             });
-            fetchWebinars();
+            setRefreshKey(prev => prev + 1);
         }
     };
 
