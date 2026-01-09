@@ -57,6 +57,7 @@ export const ProductManagement = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>(DEFAULT_CATEGORIES);
   const [loading, setLoading] = useState(true);
+  const [refreshKey, setRefreshKey] = useState(0);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [categoryDialogOpen, setCategoryDialogOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
@@ -87,59 +88,59 @@ export const ProductManagement = () => {
     is_active: true,
   });
 
-  const fetchProducts = useCallback(async () => {
-    try {
-      const { data, error } = await supabase
-        .from('products')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      setProducts((data as any) || []);
-    } catch (error: any) {
-      toast({
-        title: 'Error',
-        description: error.message,
-        variant: 'destructive',
-      });
-    } finally {
-      setLoading(false);
-    }
-  }, [toast]);
-
-  const fetchCategories = useCallback(async () => {
-    try {
-      // Note: product_categories table needs to be created first
-      // Using 'as any' to bypass TypeScript until migration is run
-      const { data, error } = await (supabase as any)
-        .from('product_categories')
-        .select('*')
-        .eq('is_active', true)
-        .order('created_at', { ascending: true });
-
-      if (error) {
-        // If table doesn't exist, use defaults
-        console.log('Using default categories:', error.message);
-        setCategories(DEFAULT_CATEGORIES);
-        return;
-      }
-
-      if (data && data.length > 0) {
-        setCategories(data as Category[]);
-      } else {
-        // Use defaults if no categories in database
-        setCategories(DEFAULT_CATEGORIES);
-      }
-    } catch (error: any) {
-      console.log('Categories fetch error, using defaults:', error.message);
-      setCategories(DEFAULT_CATEGORIES);
-    }
-  }, []);
-
   useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('products')
+          .select('*')
+          .order('created_at', { ascending: false });
+
+        if (error) throw error;
+        setProducts((data as any) || []);
+      } catch (error: any) {
+        toast({
+          title: 'Error',
+          description: error.message,
+          variant: 'destructive',
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    const fetchCategories = async () => {
+      try {
+        // Note: product_categories table needs to be created first
+        // Using 'as any' to bypass TypeScript until migration is run
+        const { data, error } = await (supabase as any)
+          .from('product_categories')
+          .select('*')
+          .eq('is_active', true)
+          .order('created_at', { ascending: true });
+
+        if (error) {
+          // If table doesn't exist, use defaults
+          console.log('Using default categories:', error.message);
+          setCategories(DEFAULT_CATEGORIES);
+          return;
+        }
+
+        if (data && data.length > 0) {
+          setCategories(data as Category[]);
+        } else {
+          // Use defaults if no categories in database
+          setCategories(DEFAULT_CATEGORIES);
+        }
+      } catch (error: any) {
+        console.log('Categories fetch error, using defaults:', error.message);
+        setCategories(DEFAULT_CATEGORIES);
+      }
+    };
+
     fetchProducts();
     fetchCategories();
-  }, [fetchProducts, fetchCategories]);
+  }, [refreshKey, toast]);
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -256,7 +257,7 @@ export const ProductManagement = () => {
       }
 
       resetCategoryForm();
-      fetchCategories();
+      setRefreshKey(prev => prev + 1);
     } catch (error: any) {
       toast({
         title: 'Error',
@@ -286,7 +287,7 @@ export const ProductManagement = () => {
 
       if (error) throw error;
       toast({ title: t({ id: 'Kategori berhasil dihapus', en: 'Category deleted successfully' }) });
-      fetchCategories();
+      setRefreshKey(prev => prev + 1);
     } catch (error: any) {
       toast({
         title: 'Error',
@@ -363,7 +364,7 @@ export const ProductManagement = () => {
 
       setDialogOpen(false);
       resetForm();
-      fetchProducts();
+      setRefreshKey(prev => prev + 1);
     } catch (error: any) {
       toast({
         title: 'Error',
@@ -389,7 +390,7 @@ export const ProductManagement = () => {
 
       if (error) throw error;
       toast({ title: t({ id: 'Produk berhasil dihapus', en: 'Product deleted successfully' }) });
-      fetchProducts();
+      setRefreshKey(prev => prev + 1);
     } catch (error: any) {
       toast({
         title: 'Error',

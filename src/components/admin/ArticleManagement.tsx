@@ -43,6 +43,7 @@ export const ArticleManagement = () => {
   const { t } = useLanguage();
   const [articles, setArticles] = useState<Article[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshKey, setRefreshKey] = useState(0);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingArticle, setEditingArticle] = useState<Article | null>(null);
   const [uploading, setUploading] = useState(false);
@@ -61,29 +62,29 @@ export const ArticleManagement = () => {
   });
 
   // Fetch Articles
-  const fetchArticles = useCallback(async () => {
-    try {
-      const { data, error } = await supabase
-        .from('articles')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      setArticles((data as any) || []);
-    } catch (error: any) {
-      toast({
-        title: 'Error',
-        description: error.message,
-        variant: 'destructive',
-      });
-    } finally {
-      setLoading(false);
-    }
-  }, [toast]);
-
   useEffect(() => {
+    const fetchArticles = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('articles')
+          .select('*')
+          .order('created_at', { ascending: false });
+
+        if (error) throw error;
+        setArticles((data as any) || []);
+      } catch (error: any) {
+        toast({
+          title: 'Error',
+          description: error.message,
+          variant: 'destructive',
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchArticles();
-  }, [fetchArticles]);
+  }, [refreshKey, toast]);
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -154,7 +155,7 @@ export const ArticleManagement = () => {
 
       setDialogOpen(false);
       resetForm();
-      fetchArticles();
+      setRefreshKey(prev => prev + 1);
     } catch (error: any) {
       toast({
         title: 'Error',
@@ -175,7 +176,7 @@ export const ArticleManagement = () => {
 
       if (error) throw error;
       toast({ title: 'Article deleted successfully' });
-      fetchArticles();
+      setRefreshKey(prev => prev + 1);
     } catch (error: any) {
       toast({
         title: 'Error',

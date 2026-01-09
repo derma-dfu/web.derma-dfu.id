@@ -86,6 +86,7 @@ const Admin = () => {
     const [activeTab, setActiveTab] = useState("dashboard");
 
     useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setMounted(true);
     }, []);
 

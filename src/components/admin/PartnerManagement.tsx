@@ -43,6 +43,7 @@ export const PartnerManagement = () => {
   const { t } = useLanguage();
   const [partners, setPartners] = useState<Partner[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshKey, setRefreshKey] = useState(0);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingPartner, setEditingPartner] = useState<Partner | null>(null);
   const [uploading, setUploading] = useState(false);
@@ -62,28 +63,28 @@ export const PartnerManagement = () => {
   });
 
   useEffect(() => {
+    const fetchPartners = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('partners')
+          .select('*')
+          .order('created_at', { ascending: false });
+
+        if (error) throw error;
+        setPartners((data as any) || []);
+      } catch (error: any) {
+        toast({
+          title: 'Error',
+          description: error.message,
+          variant: 'destructive',
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchPartners();
-  }, []);
-
-  const fetchPartners = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('partners')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      setPartners((data as any) || []);
-    } catch (error: any) {
-      toast({
-        title: 'Error',
-        description: error.message,
-        variant: 'destructive',
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
+  }, [refreshKey, toast]);
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -155,7 +156,7 @@ export const PartnerManagement = () => {
 
       setDialogOpen(false);
       resetForm();
-      fetchPartners();
+      setRefreshKey(prev => prev + 1);
     } catch (error: any) {
       toast({
         title: 'Error',
@@ -176,7 +177,7 @@ export const PartnerManagement = () => {
 
       if (error) throw error;
       toast({ title: 'Partner deleted successfully' });
-      fetchPartners();
+      setRefreshKey(prev => prev + 1);
     } catch (error: any) {
       toast({
         title: 'Error',

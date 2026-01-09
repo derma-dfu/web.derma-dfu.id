@@ -83,33 +83,33 @@ export const WebinarManagement = () => {
     const [tempSpeaker, setTempSpeaker] = useState<Speaker>({ name: "", role: "" });
 
     // Fetch Webinars
-    const fetchWebinars = useCallback(async () => {
-        setIsLoading(true);
-        const { data, error } = await supabase
-            .from("webinars")
-            .select("*")
-            .order("date", { ascending: false });
-
-        if (error) {
-            toast({
-                title: "Error fetching webinars",
-                description: error.message,
-                variant: "destructive",
-            });
-        } else {
-            // Safe cast for speakers jsonb
-            const formattedData = data?.map(item => ({
-                ...item,
-                speakers: item.speakers as unknown as Speaker[]
-            })) || [];
-            setWebinars(formattedData);
-        }
-        setIsLoading(false);
-    }, [toast]);
-
     useEffect(() => {
+        const fetchWebinars = async () => {
+            setIsLoading(true);
+            const { data, error } = await supabase
+                .from("webinars")
+                .select("*")
+                .order("date", { ascending: false });
+
+            if (error) {
+                toast({
+                    title: "Error fetching webinars",
+                    description: error.message,
+                    variant: "destructive",
+                });
+            } else {
+                // Safe cast for speakers jsonb
+                const formattedData = data?.map(item => ({
+                    ...item,
+                    speakers: item.speakers as unknown as Speaker[]
+                })) || [];
+                setWebinars(formattedData);
+            }
+            setIsLoading(false);
+        };
+
         fetchWebinars();
-    }, [fetchWebinars]);
+    }, [toast]);
 
     // Handle Image Upload
     const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {

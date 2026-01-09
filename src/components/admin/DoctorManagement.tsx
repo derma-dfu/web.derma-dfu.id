@@ -76,29 +76,29 @@ export const DoctorManagement = () => {
     const [editingId, setEditingId] = useState<string | null>(null);
     const [tempCredential, setTempCredential] = useState("");
 
-    // Fetch Doctors
-    const fetchDoctors = useCallback(async () => {
-        setIsLoading(true);
-        const { data, error } = await supabase
-            .from("doctors" as any)
-            .select("*")
-            .order("created_at", { ascending: true });
-
-        if (error) {
-            toast({
-                title: "Error fetching doctors",
-                description: error.message,
-                variant: "destructive",
-            });
-        } else {
-            setDoctors((data as unknown as Doctor[]) || []);
-        }
-        setIsLoading(false);
-    }, [toast]);
-
+    // Fetch Doctors - Defined inside useEffect to avoid dependency issues
     useEffect(() => {
+        const fetchDoctors = async () => {
+            setIsLoading(true);
+            const { data, error } = await supabase
+                .from("doctors" as any)
+                .select("*")
+                .order("created_at", { ascending: true });
+
+            if (error) {
+                toast({
+                    title: "Error fetching doctors",
+                    description: error.message,
+                    variant: "destructive",
+                });
+            } else {
+                setDoctors((data as unknown as Doctor[]) || []);
+            }
+            setIsLoading(false);
+        };
+
         fetchDoctors();
-    }, [fetchDoctors]);
+    }, [toast]);
 
     // Handle Image Upload
     const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
