@@ -17,6 +17,7 @@ function PaymentSuccessContent() {
     const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setMounted(true);
 
         // Clear cart after successful payment

@@ -53,7 +53,7 @@ const Cart = () => {
     const [showShippingForm, setShowShippingForm] = useState(false);
 
     useEffect(() => {
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setMounted(true);
 
         // Load cart items from localStorage
