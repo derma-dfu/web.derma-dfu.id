@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -19,10 +19,21 @@ import {
 } from 'hugeicons-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+// Keep static imports as fallback
 import kemenkesLogo from '@/assets/partners/kemenkes.png';
 import risetaMedicaLogo from '@/assets/partners/riseta-medica.png';
 import metadermaLogo from '@/assets/partners/metaderma.png';
 import docprenLogo from '@/assets/partners/docpren.png';
+
+interface Partner {
+    id: string;
+    name: string;
+    description_id: string | null;
+    description_en: string | null;
+    logo_url: string | null;
+    website_url: string | null;
+    is_active: boolean;
+}
 
 const Partners = () => {
     const { t } = useLanguage();
@@ -35,7 +46,33 @@ const Partners = () => {
         description: ''
     });
 
-    const partnerLogos = [
+    // Database partners
+    const [dbPartners, setDbPartners] = useState<Partner[]>([]);
+    const [loadingPartners, setLoadingPartners] = useState(true);
+
+    // Fetch partners from database
+    useEffect(() => {
+        const fetchPartners = async () => {
+            try {
+                const { data, error } = await supabase
+                    .from('partners')
+                    .select('*')
+                    .eq('is_active', true)
+                    .order('created_at', { ascending: true });
+
+                if (error) throw error;
+                setDbPartners((data as Partner[]) || []);
+            } catch (error: any) {
+                console.error('Error fetching partners:', error);
+            } finally {
+                setLoadingPartners(false);
+            }
+        };
+        fetchPartners();
+    }, []);
+
+    // Static fallback if no database partners
+    const staticPartnerLogos = [
         { name: 'Kemenkes', logo: kemenkesLogo },
         { name: 'Riseta Medica Inovasia', logo: risetaMedicaLogo },
         { name: 'Metaderma', logo: metadermaLogo },
@@ -319,15 +356,41 @@ const Partners = () => {
                         {t({ id: 'Dipercaya Oleh', en: 'Trusted By' })}
                     </h2>
                     <div className="flex flex-wrap justify-center gap-8 md:gap-12 items-center">
-                        {partnerLogos.map((partner, index) => (
-                            <div key={index} className="bg-white p-4 rounded-xl shadow-sm border border-border/50 hover:border-primary/20 hover:shadow-md transition-all w-40 h-24 flex items-center justify-center">
-                                <img
-                                    src={partner.logo.src}
-                                    alt={partner.name}
-                                    className="max-h-16 w-auto object-contain transition-all duration-300 transform hover:scale-105"
-                                />
-                            </div>
-                        ))}
+                        {loadingPartners ? (
+                            <Loading03Icon className="h-8 w-8 animate-spin text-primary" />
+                        ) : dbPartners.length > 0 ? (
+                            // Render from database
+                            dbPartners.map((partner: Partner) => (
+                                <a
+                                    key={partner.id}
+                                    href={partner.website_url || '#'}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="bg-white p-4 rounded-xl shadow-sm border border-border/50 hover:border-primary/20 hover:shadow-md transition-all w-40 h-24 flex items-center justify-center"
+                                >
+                                    {partner.logo_url ? (
+                                        <img
+                                            src={partner.logo_url}
+                                            alt={partner.name}
+                                            className="max-h-16 w-auto object-contain transition-all duration-300 transform hover:scale-105"
+                                        />
+                                    ) : (
+                                        <span className="text-sm text-center font-medium text-secondary">{partner.name}</span>
+                                    )}
+                                </a>
+                            ))
+                        ) : (
+                            // Fallback to static logos
+                            staticPartnerLogos.map((partner, index: number) => (
+                                <div key={index} className="bg-white p-4 rounded-xl shadow-sm border border-border/50 hover:border-primary/20 hover:shadow-md transition-all w-40 h-24 flex items-center justify-center">
+                                    <img
+                                        src={partner.logo.src}
+                                        alt={partner.name}
+                                        className="max-h-16 w-auto object-contain transition-all duration-300 transform hover:scale-105"
+                                    />
+                                </div>
+                            ))
+                        )}
                     </div>
                 </div>
             </div>

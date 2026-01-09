@@ -39,8 +39,13 @@ const Auth = () => {
             try {
                 const { data: { session } } = await supabase.auth.getSession();
                 if (mounted && session && !showVerificationSent) {
-                    // Use replace to prevent back navigation loop
-                    router.replace('/dashboard');
+                    // Check role immediately to avoid double redirect
+                    const role = session.user.user_metadata?.role;
+                    if (role === 'admin') {
+                        router.replace('/admin');
+                    } else {
+                        router.replace('/dashboard');
+                    }
                 }
             } catch (error) {
                 console.error("Session check error:", error);
@@ -51,7 +56,12 @@ const Auth = () => {
 
         const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
             if (mounted && session && !showVerificationSent) {
-                router.replace('/dashboard');
+                const role = session.user.user_metadata?.role;
+                if (role === 'admin') {
+                    router.replace('/admin');
+                } else {
+                    router.replace('/dashboard');
+                }
             }
         });
 

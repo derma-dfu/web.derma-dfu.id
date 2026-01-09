@@ -7,12 +7,13 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useLanguage } from '@/contexts/LanguageContext';
 import {
-    Message01Icon,
+    ShoppingCart01Icon,
     Loading03Icon,
     BandageIcon, // For bandaid emoji
     Tick02Icon   // For checkmark
 } from 'hugeicons-react';
 import { useToast } from '@/hooks/use-toast';
+import { useRouter } from 'next/navigation';
 import { supabase } from '@/integrations/supabase/client';
 import hydroDressing from '@/assets/products/hydrocolloid-dressing.jpg';
 import digitalMonitoring from '@/assets/products/digital-monitoring.jpg';
@@ -23,6 +24,7 @@ import sepatuCtev from '@/assets/products/sepatu-ctev.png';
 const Products = () => {
     const { t } = useLanguage();
     const { toast } = useToast();
+    const router = useRouter();
     const [selectedCategory, setSelectedCategory] = useState('all');
     const [products, setProducts] = useState<any[]>([]);
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -93,10 +95,43 @@ const Products = () => {
             : products.filter(p => p.category === category);
     };
 
-    const handleOrderWhatsApp = (productTitle: string) => {
-        const message = encodeURIComponent(`Halo, saya tertarik untuk memesan ${productTitle}`);
-        const whatsappNumber = '6281234567890'; // Update with actual WhatsApp number
-        window.open(`https://wa.me/${whatsappNumber}?text=${message}`, '_blank');
+    const handleAddToCart = (product: any) => {
+        // Store product in localStorage for cart
+        const cartItems = JSON.parse(localStorage.getItem('cartItems') || '[]');
+
+        // Check if product already in cart
+        const existingIndex = cartItems.findIndex((item: any) => item.product_id === product.id);
+
+        if (existingIndex >= 0) {
+            cartItems[existingIndex].quantity += 1;
+        } else {
+            // Get image URL - from database or from static assets
+            let imageUrl = product.image_url;
+            if (!imageUrl) {
+                const staticImage = getProductImage(product.title_id);
+                // StaticImageData.src is a string path like /_next/static/media/...
+                imageUrl = staticImage?.src || null;
+            }
+
+            cartItems.push({
+                id: crypto.randomUUID(),
+                product_id: product.id,
+                title: { id: product.title_id, en: product.title_en },
+                price: product.price,
+                quantity: 1,
+                image_url: imageUrl
+            });
+        }
+
+        localStorage.setItem('cartItems', JSON.stringify(cartItems));
+
+        toast({
+            title: t({ id: 'Ditambahkan ke Keranjang', en: 'Added to Cart' }),
+            description: t({ id: product.title_id, en: product.title_en }),
+        });
+
+        // Redirect to cart
+        router.push('/cart');
     };
 
     if (loading) {
@@ -172,11 +207,20 @@ const Products = () => {
                                         <h3 className="text-xl font-bold text-gray-900 mb-3 group-hover:text-primary transition-colors line-clamp-2">
                                             {t({ id: product.title_id, en: product.title_en })}
                                         </h3>
-                                        <p className="text-muted-foreground text-sm line-clamp-3 mb-6 flex-grow leading-relaxed">
+                                        <p className="text-muted-foreground text-sm line-clamp-3 mb-4 flex-grow leading-relaxed">
                                             {t({ id: product.description_id, en: product.description_en })}
                                         </p>
 
-                                        <div className="space-y-3 mb-8">
+                                        {/* Price Display */}
+                                        {product.price > 0 && (
+                                            <div className="mb-4">
+                                                <span className="text-2xl font-bold text-primary">
+                                                    Rp {product.price.toLocaleString('id-ID')}
+                                                </span>
+                                            </div>
+                                        )}
+
+                                        <div className="space-y-3 mb-6">
                                             {product.features_id?.slice(0, 3).map((feature: string, idx: number) => (
                                                 <div key={idx} className="flex items-start space-x-3 text-sm text-gray-600">
                                                     <div className="mt-0.5 min-w-[16px] flex justify-center">
@@ -189,10 +233,10 @@ const Products = () => {
 
                                         <Button
                                             className="w-full rounded-xl h-12 text-base font-semibold shadow-lg shadow-primary/20 hover:shadow-primary/40 hover:-translate-y-0.5 transition-all"
-                                            onClick={() => handleOrderWhatsApp(t({ id: product.title_id, en: product.title_en }))}
+                                            onClick={() => handleAddToCart(product)}
                                         >
-                                            <Message01Icon className="mr-2 h-5 w-5" />
-                                            {t({ id: 'Pesan Sekarang', en: 'Order Now' })}
+                                            <ShoppingCart01Icon className="mr-2 h-5 w-5" />
+                                            {t({ id: 'Tambah ke Keranjang', en: 'Add to Cart' })}
                                         </Button>
                                     </div>
                                 </Card>

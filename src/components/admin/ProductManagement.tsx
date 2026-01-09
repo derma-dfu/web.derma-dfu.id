@@ -33,6 +33,7 @@ interface Product {
   image_url: string | null;
   features_id: string[];
   features_en: string[];
+  price: number;
   is_active: boolean;
 }
 
@@ -61,8 +62,6 @@ export const ProductManagement = () => {
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [uploading, setUploading] = useState(false);
-  const [translating, setTranslating] = useState(false);
-  const [translatingCategory, setTranslatingCategory] = useState(false);
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [productToDelete, setProductToDelete] = useState<string | null>(null);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
@@ -84,6 +83,7 @@ export const ProductManagement = () => {
     category: 'dressing',
     features_id: [''] as string[],
     features_en: [''] as string[],
+    price: 100000, // Default 100k IDR
     is_active: true,
   });
 
@@ -223,35 +223,8 @@ export const ProductManagement = () => {
 
     try {
       const slug = categoryFormData.slug || categoryFormData.name_id.toLowerCase().replace(/\s+/g, '_');
-      let name_en = categoryFormData.name_en;
-
-      // Auto-translate if adding new category (not editing)
-      if (!editingCategory && !categoryFormData.name_en) {
-        setTranslatingCategory(true);
-        try {
-          const response = await fetch('/api/translate', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              fields: {
-                name: categoryFormData.name_id,
-              },
-              direction: 'id-to-en',
-              context: 'product category names for healthcare and wound care products',
-            }),
-          });
-
-          if (response.ok) {
-            const { translations } = await response.json();
-            name_en = translations.name || categoryFormData.name_id;
-          }
-        } catch (translateError) {
-          console.error('Translation failed:', translateError);
-          name_en = categoryFormData.name_id; // Fallback to Indonesian
-        } finally {
-          setTranslatingCategory(false);
-        }
-      }
+      // Use English name if provided, otherwise fallback to Indonesian
+      const name_en = categoryFormData.name_en || categoryFormData.name_id;
 
       if (editingCategory && !editingCategory.id.startsWith('default-')) {
         // Update existing category
@@ -341,56 +314,18 @@ export const ProductManagement = () => {
     });
   };
 
-  const handleSubmit = async (e: React.FormEvent, imageUrl?: string) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     try {
-      let title_en = formData.title_en;
-      let description_en = formData.description_en;
-      let features_en = formData.features_en;
-
       // Filter out empty features
       const cleanFeaturesId = formData.features_id.filter(f => f.trim() !== '');
+      const cleanFeaturesEn = formData.features_en.filter(f => f.trim() !== '');
 
-      // Auto-translate if adding new product (not editing)
-      if (!editingProduct) {
-        setTranslating(true);
-        try {
-          const response = await fetch('/api/translate', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              fields: {
-                title: formData.title_id,
-                description: formData.description_id,
-                features: cleanFeaturesId.join(', '),
-              },
-              direction: 'id-to-en',
-              context: 'healthcare products and wound care',
-            }),
-          });
-
-          if (response.ok) {
-            const { translations } = await response.json();
-            title_en = translations.title || '';
-            description_en = translations.description || '';
-            // Split translated features back to array
-            features_en = translations.features ? translations.features.split(',').map((f: string) => f.trim()) : [];
-          }
-        } catch (translateError) {
-          console.error('Translation failed:', translateError);
-          toast({
-            title: 'Peringatan',
-            description: 'Auto-translate gagal, data disimpan tanpa terjemahan.',
-            variant: 'destructive',
-          });
-        } finally {
-          setTranslating(false);
-        }
-      } else {
-        // When editing, filter empty features from EN too
-        features_en = formData.features_en.filter(f => f.trim() !== '');
-      }
+      // Use English values if provided, otherwise fallback to Indonesian
+      const title_en = formData.title_en || formData.title_id;
+      const description_en = formData.description_en || formData.description_id;
+      const features_en = cleanFeaturesEn.length > 0 ? cleanFeaturesEn : cleanFeaturesId;
 
       const productData = {
         title_id: formData.title_id,
@@ -400,8 +335,10 @@ export const ProductManagement = () => {
         category: formData.category,
         features_id: cleanFeaturesId,
         features_en: features_en,
+        price: formData.price,
         is_active: formData.is_active,
-        image_url: imageUrl || editingProduct?.image_url,
+        // Use state imageUrl if set, otherwise keep existing image
+        image_url: imageUrl || editingProduct?.image_url || null,
       };
 
       if (editingProduct) {
@@ -474,6 +411,7 @@ export const ProductManagement = () => {
       category: product.category,
       features_id: product.features_id?.length > 0 ? product.features_id : [''],
       features_en: product.features_en?.length > 0 ? product.features_en : [''],
+      price: product.price || 100000,
       is_active: product.is_active,
     });
     setDialogOpen(true);
@@ -490,6 +428,7 @@ export const ProductManagement = () => {
       category: categories[0]?.slug || 'dressing',
       features_id: [''],
       features_en: [''],
+      price: 100000,
       is_active: true,
     });
   };
@@ -531,16 +470,15 @@ export const ProductManagement = () => {
               </DialogDescription>
             </DialogHeader>
             <form onSubmit={handleSubmit} className="space-y-4">
-              {/* Add mode info banner */}
-              {!editingProduct && (
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-sm text-blue-700">
-                  💡 Isi dalam Bahasa Indonesia, terjemahan English akan dibuat otomatis saat simpan.
-                </div>
-              )}
+              {/* Info banner */}
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-sm text-blue-700">
+                💡 {t({ id: 'Field English bersifat opsional. Jika dikosongkan, akan menggunakan teks Indonesia.', en: 'English fields are optional. If left empty, Indonesian text will be used.' })}
+              </div>
 
-              <div className={editingProduct ? "grid grid-cols-1 md:grid-cols-2 gap-4" : ""}>
+              {/* Title fields - always show both */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <Label>{t({ id: 'Judul Produk', en: 'Product Title' })}</Label>
+                  <Label>{t({ id: 'Judul Produk (ID)', en: 'Product Title (ID)' })} *</Label>
                   <Input
                     value={formData.title_id}
                     onChange={(e) => setFormData({ ...formData, title_id: e.target.value })}
@@ -548,38 +486,53 @@ export const ProductManagement = () => {
                     required
                   />
                 </div>
-                {editingProduct && (
-                  <div>
-                    <Label>{t({ id: 'Judul Produk (EN)', en: 'Product Title (EN)' })}</Label>
-                    <Input
-                      value={formData.title_en}
-                      onChange={(e) => setFormData({ ...formData, title_en: e.target.value })}
-                      required
-                    />
-                  </div>
-                )}
+                <div>
+                  <Label>{t({ id: 'Judul Produk (EN)', en: 'Product Title (EN)' })}</Label>
+                  <Input
+                    value={formData.title_en}
+                    onChange={(e) => setFormData({ ...formData, title_en: e.target.value })}
+                    placeholder={t({ id: 'Opsional - gunakan Indonesia jika kosong', en: 'Optional - uses Indonesian if empty' })}
+                  />
+                </div>
               </div>
 
-              <div>
-                <Label>{t({ id: 'Deskripsi', en: 'Description' })}</Label>
-                <Textarea
-                  value={formData.description_id}
-                  onChange={(e) => setFormData({ ...formData, description_id: e.target.value })}
-                  placeholder={t({ id: 'Masukkan deskripsi produk', en: 'Enter product description' })}
-                  required
-                />
-              </div>
-
-              {editingProduct && (
+              {/* Description fields - always show both */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label>{t({ id: 'Deskripsi (ID)', en: 'Description (ID)' })} *</Label>
+                  <Textarea
+                    value={formData.description_id}
+                    onChange={(e) => setFormData({ ...formData, description_id: e.target.value })}
+                    placeholder={t({ id: 'Masukkan deskripsi produk', en: 'Enter product description' })}
+                    required
+                  />
+                </div>
                 <div>
                   <Label>{t({ id: 'Deskripsi (EN)', en: 'Description (EN)' })}</Label>
                   <Textarea
                     value={formData.description_en}
                     onChange={(e) => setFormData({ ...formData, description_en: e.target.value })}
-                    required
+                    placeholder={t({ id: 'Opsional - gunakan Indonesia jika kosong', en: 'Optional - uses Indonesian if empty' })}
                   />
                 </div>
-              )}
+              </div>
+
+              {/* Price Input */}
+              <div>
+                <Label>{t({ id: 'Harga (Rp)', en: 'Price (Rp)' })} *</Label>
+                <Input
+                  type="number"
+                  value={formData.price}
+                  onChange={(e) => setFormData({ ...formData, price: parseInt(e.target.value) || 0 })}
+                  placeholder="100000"
+                  min={0}
+                  step={1000}
+                  required
+                />
+                <p className="text-xs text-muted-foreground mt-1">
+                  {t({ id: 'Masukkan harga dalam Rupiah (contoh: 100000 untuk Rp 100.000)', en: 'Enter price in Rupiah (e.g., 100000 for Rp 100,000)' })}
+                </p>
+              </div>
 
               {/* Category with Management Button */}
               <div>
@@ -616,15 +569,13 @@ export const ProductManagement = () => {
 
                       {/* Category Form */}
                       <form onSubmit={handleCategorySubmit} className="space-y-4 border-b pb-4">
-                        {/* Info banner for new category */}
-                        {!editingCategory && (
-                          <div className="bg-blue-50 border border-blue-200 rounded-lg p-2 text-xs text-blue-700">
-                            💡 Isi nama dalam Bahasa Indonesia, terjemahan English akan dibuat otomatis.
-                          </div>
-                        )}
+                        {/* Info banner */}
+                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-2 text-xs text-blue-700">
+                          💡 {t({ id: 'Field English opsional. Jika kosong, gunakan teks Indonesia.', en: 'English field is optional. Uses Indonesian if empty.' })}
+                        </div>
                         <div className="grid grid-cols-1 gap-3">
                           <div>
-                            <Label>{t({ id: 'Nama Kategori', en: 'Category Name' })}</Label>
+                            <Label>{t({ id: 'Nama Kategori (ID)', en: 'Category Name (ID)' })} *</Label>
                             <Input
                               value={categoryFormData.name_id}
                               onChange={(e) => setCategoryFormData({ ...categoryFormData, name_id: e.target.value })}
@@ -632,17 +583,14 @@ export const ProductManagement = () => {
                               required
                             />
                           </div>
-                          {editingCategory && (
-                            <div>
-                              <Label>{t({ id: 'Nama Kategori (EN)', en: 'Category Name (EN)' })}</Label>
-                              <Input
-                                value={categoryFormData.name_en}
-                                onChange={(e) => setCategoryFormData({ ...categoryFormData, name_en: e.target.value })}
-                                placeholder={t({ id: 'Contoh: Wound Care', en: 'Example: Wound Care' })}
-                                required
-                              />
-                            </div>
-                          )}
+                          <div>
+                            <Label>{t({ id: 'Nama Kategori (EN)', en: 'Category Name (EN)' })}</Label>
+                            <Input
+                              value={categoryFormData.name_en}
+                              onChange={(e) => setCategoryFormData({ ...categoryFormData, name_en: e.target.value })}
+                              placeholder={t({ id: 'Opsional - gunakan Indonesia jika kosong', en: 'Optional - uses Indonesian if empty' })}
+                            />
+                          </div>
                           <div>
                             <Label>{t({ id: 'Slug (opsional)', en: 'Slug (optional)' })}</Label>
                             <Input
@@ -653,18 +601,9 @@ export const ProductManagement = () => {
                           </div>
                         </div>
                         <div className="flex gap-2">
-                          <Button type="submit" className="flex-1" disabled={translatingCategory}>
-                            {translatingCategory ? (
-                              <>
-                                <Loading03Icon className="mr-2 h-4 w-4 animate-spin" />
-                                {t({ id: 'Menerjemahkan...', en: 'Translating...' })}
-                              </>
-                            ) : (
-                              <>
-                                <PlusSignIcon className="mr-2 h-4 w-4" />
-                                {editingCategory ? t({ id: 'Perbarui', en: 'Update' }) : t({ id: 'Tambah Kategori', en: 'Add Category' })}
-                              </>
-                            )}
+                          <Button type="submit" className="flex-1">
+                            <PlusSignIcon className="mr-2 h-4 w-4" />
+                            {editingCategory ? t({ id: 'Perbarui', en: 'Update' }) : t({ id: 'Tambah Kategori', en: 'Add Category' })}
                           </Button>
                           {editingCategory && (
                             <Button type="button" variant="outline" onClick={resetCategoryForm}>
@@ -711,48 +650,50 @@ export const ProductManagement = () => {
                 </div>
               </div>
 
-              {/* Dynamic Features Input - Indonesian */}
-              <div className="space-y-2 border p-4 rounded-lg bg-slate-50">
-                <Label>{t({ id: 'Fitur Produk', en: 'Product Features' })}</Label>
-                <div className="space-y-2">
-                  {formData.features_id.map((feature, idx) => (
-                    <div key={idx} className="flex gap-2">
-                      <Input
-                        value={feature}
-                        onChange={(e) => updateFeature('id', idx, e.target.value)}
-                        placeholder={`${t({ id: 'Fitur', en: 'Feature' })} ${idx + 1}`}
-                        className="flex-1"
-                      />
-                      {formData.features_id.length > 1 && (
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => removeFeature('id', idx)}
-                          className="h-10 w-10 text-red-500 hover:text-red-600 hover:bg-red-50"
-                        >
-                          <Cancel01Icon className="h-4 w-4" />
-                        </Button>
-                      )}
-                    </div>
-                  ))}
+              {/* Dynamic Features Input - Both Languages */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Indonesian Features */}
+                <div className="space-y-2 border p-4 rounded-lg bg-slate-50">
+                  <Label>{t({ id: 'Fitur Produk (ID)', en: 'Product Features (ID)' })} *</Label>
+                  <div className="space-y-2">
+                    {formData.features_id.map((feature, idx) => (
+                      <div key={idx} className="flex gap-2">
+                        <Input
+                          value={feature}
+                          onChange={(e) => updateFeature('id', idx, e.target.value)}
+                          placeholder={`${t({ id: 'Fitur', en: 'Feature' })} ${idx + 1}`}
+                          className="flex-1"
+                        />
+                        {formData.features_id.length > 1 && (
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => removeFeature('id', idx)}
+                            className="h-10 w-10 text-red-500 hover:text-red-600 hover:bg-red-50"
+                          >
+                            <Cancel01Icon className="h-4 w-4" />
+                          </Button>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => addFeature('id')}
+                    className="mt-2"
+                  >
+                    <PlusSignIcon className="mr-2 h-4 w-4" />
+                    {t({ id: 'Tambah Fitur', en: 'Add Feature' })}
+                  </Button>
                 </div>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => addFeature('id')}
-                  className="mt-2"
-                >
-                  <PlusSignIcon className="mr-2 h-4 w-4" />
-                  {t({ id: 'Tambah Fitur', en: 'Add Feature' })}
-                </Button>
-              </div>
 
-              {/* Dynamic Features Input - English (only when editing) */}
-              {editingProduct && (
+                {/* English Features */}
                 <div className="space-y-2 border p-4 rounded-lg bg-slate-50">
                   <Label>{t({ id: 'Fitur Produk (EN)', en: 'Product Features (EN)' })}</Label>
+                  <p className="text-xs text-muted-foreground mb-2">{t({ id: 'Opsional - gunakan Indonesia jika kosong', en: 'Optional - uses Indonesian if empty' })}</p>
                   <div className="space-y-2">
                     {formData.features_en.map((feature, idx) => (
                       <div key={idx} className="flex gap-2">
@@ -787,7 +728,7 @@ export const ProductManagement = () => {
                     {t({ id: 'Tambah Fitur', en: 'Add Feature' })}
                   </Button>
                 </div>
-              )}
+              </div>
 
               <div>
                 <Label>{t({ id: 'Gambar Produk', en: 'Product Image' })}</Label>
@@ -813,9 +754,9 @@ export const ProductManagement = () => {
                 <Label>{t({ id: 'Aktif', en: 'Active' })}</Label>
               </div>
 
-              <Button type="submit" disabled={uploading || translating} className="w-full">
-                {(uploading || translating) && <Loading03Icon className="mr-2 h-4 w-4 animate-spin" />}
-                {translating ? t({ id: 'Menerjemahkan...', en: 'Translating...' }) : editingProduct ? t({ id: 'Perbarui', en: 'Update' }) : t({ id: 'Simpan', en: 'Save' })}
+              <Button type="submit" disabled={uploading} className="w-full">
+                {uploading && <Loading03Icon className="mr-2 h-4 w-4 animate-spin" />}
+                {editingProduct ? t({ id: 'Perbarui', en: 'Update' }) : t({ id: 'Simpan', en: 'Save' })}
               </Button>
             </form>
           </DialogContent>
@@ -823,125 +764,135 @@ export const ProductManagement = () => {
       </div>
 
       {/* Product Table */}
-      <div className="overflow-x-auto">
-        <Table className="min-w-[800px]">
-          <TableHeader>
-            <TableRow className="bg-slate-50">
-              <TableHead className="w-[80px]">{t({ id: 'Gambar', en: 'Image' })}</TableHead>
-              <TableHead>{t({ id: 'Nama Produk', en: 'Product Name' })}</TableHead>
-              <TableHead className="w-[120px]">{t({ id: 'Kategori', en: 'Category' })}</TableHead>
-              <TableHead className="w-[100px]">{t({ id: 'Status', en: 'Status' })}</TableHead>
-              <TableHead>{t({ id: 'Fitur', en: 'Features' })}</TableHead>
-              <TableHead className="w-[100px] text-right">{t({ id: 'Aksi', en: 'Actions' })}</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {products.length === 0 ? (
+      <div className="bg-white rounded-lg border shadow-sm overflow-hidden">
+        <div className="overflow-x-auto">
+          <Table className="min-w-[800px]">
+            <TableHeader>
               <TableRow>
-                <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
-                  {t({ id: 'Belum ada produk. Klik "Tambah Produk" untuk menambahkan.', en: 'No products yet. Click "Add Product" to create one.' })}
-                </TableCell>
+                <TableHead className="w-[80px]">{t({ id: 'Gambar', en: 'Image' })}</TableHead>
+                <TableHead>{t({ id: 'Nama Produk', en: 'Product Name' })}</TableHead>
+                <TableHead className="w-[120px]">{t({ id: 'Harga', en: 'Price' })}</TableHead>
+                <TableHead className="w-[120px]">{t({ id: 'Kategori', en: 'Category' })}</TableHead>
+                <TableHead className="w-[100px]">{t({ id: 'Status', en: 'Status' })}</TableHead>
+                <TableHead>{t({ id: 'Fitur', en: 'Features' })}</TableHead>
+                <TableHead className="w-[100px] text-right">{t({ id: 'Aksi', en: 'Actions' })}</TableHead>
               </TableRow>
-            ) : (
-              products.map((product) => (
-                <TableRow key={product.id} className="hover:bg-slate-50">
-                  {/* Thumbnail */}
-                  <TableCell>
-                    {product.image_url ? (
-                      <img
-                        src={product.image_url}
-                        alt={product.title_id}
-                        className="w-12 h-12 object-cover rounded-lg border"
-                      />
-                    ) : (
-                      <div className="w-12 h-12 bg-slate-100 rounded-lg flex items-center justify-center">
-                        <Image01Icon className="w-5 h-5 text-slate-400" />
-                      </div>
-                    )}
-                  </TableCell>
-
-                  {/* Product Name & Description */}
-                  <TableCell>
-                    <div>
-                      <p className="font-medium text-slate-900">{product.title_id}</p>
-                      <p className="text-sm text-muted-foreground line-clamp-1 max-w-[300px]">
-                        {product.description_id}
-                      </p>
-                    </div>
-                  </TableCell>
-
-                  {/* Category Badge */}
-                  <TableCell>
-                    <Badge variant="secondary" className="bg-blue-50 text-blue-700 hover:bg-blue-100">
-                      {getCategoryName(product.category)}
-                    </Badge>
-                  </TableCell>
-
-                  {/* Status Badge */}
-                  <TableCell>
-                    {product.is_active ? (
-                      <Badge className="bg-green-100 text-green-700 hover:bg-green-200">
-                        {t({ id: 'Aktif', en: 'Active' })}
-                      </Badge>
-                    ) : (
-                      <Badge variant="secondary" className="bg-red-50 text-red-600 hover:bg-red-100">
-                        {t({ id: 'Nonaktif', en: 'Inactive' })}
-                      </Badge>
-                    )}
-                  </TableCell>
-
-                  {/* Features */}
-                  <TableCell>
-                    <div className="flex flex-wrap gap-1 max-w-[200px]">
-                      {product.features_id && product.features_id.length > 0 ? (
-                        <>
-                          {product.features_id.slice(0, 2).map((feature, idx) => (
-                            <Badge key={idx} variant="outline" className="text-xs">
-                              {feature}
-                            </Badge>
-                          ))}
-                          {product.features_id.length > 2 && (
-                            <Badge variant="outline" className="text-xs bg-slate-50">
-                              +{product.features_id.length - 2}
-                            </Badge>
-                          )}
-                        </>
-                      ) : (
-                        <span className="text-xs text-muted-foreground">-</span>
-                      )}
-                    </div>
-                  </TableCell>
-
-                  {/* Actions */}
-                  <TableCell className="text-right">
-                    <div className="flex justify-end gap-1">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8"
-                        onClick={() => openEditDialog(product)}
-                      >
-                        <Edit02Icon className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8 text-red-500 hover:text-red-600 hover:bg-red-50"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          openDeleteConfirm(product.id);
-                        }}
-                      >
-                        <Delete02Icon className="h-4 w-4" />
-                      </Button>
-                    </div>
+            </TableHeader>
+            <TableBody>
+              {products.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+                    {t({ id: 'Belum ada produk. Klik "Tambah Produk" untuk menambahkan.', en: 'No products yet. Click "Add Product" to create one.' })}
                   </TableCell>
                 </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
+              ) : (
+                products.map((product) => (
+                  <TableRow key={product.id} className="hover:bg-slate-50">
+                    {/* Thumbnail */}
+                    <TableCell>
+                      {product.image_url ? (
+                        <img
+                          src={product.image_url}
+                          alt={product.title_id}
+                          className="w-12 h-12 object-cover rounded-lg border"
+                        />
+                      ) : (
+                        <div className="w-12 h-12 bg-slate-100 rounded-lg flex items-center justify-center">
+                          <Image01Icon className="w-5 h-5 text-slate-400" />
+                        </div>
+                      )}
+                    </TableCell>
+
+                    {/* Product Name & Description */}
+                    <TableCell>
+                      <div>
+                        <p className="font-medium text-slate-900">{product.title_id}</p>
+                        <p className="text-sm text-muted-foreground line-clamp-1 max-w-[300px]">
+                          {product.description_id}
+                        </p>
+                      </div>
+                    </TableCell>
+
+                    {/* Price */}
+                    <TableCell>
+                      <span className="font-medium text-green-600">
+                        Rp {(product.price || 0).toLocaleString('id-ID')}
+                      </span>
+                    </TableCell>
+
+                    {/* Category Badge */}
+                    <TableCell>
+                      <Badge variant="secondary" className="bg-blue-50 text-blue-700 hover:bg-blue-100">
+                        {getCategoryName(product.category)}
+                      </Badge>
+                    </TableCell>
+
+                    {/* Status Badge */}
+                    <TableCell>
+                      {product.is_active ? (
+                        <Badge className="bg-green-100 text-green-700 hover:bg-green-200">
+                          {t({ id: 'Aktif', en: 'Active' })}
+                        </Badge>
+                      ) : (
+                        <Badge variant="secondary" className="bg-red-50 text-red-600 hover:bg-red-100">
+                          {t({ id: 'Nonaktif', en: 'Inactive' })}
+                        </Badge>
+                      )}
+                    </TableCell>
+
+                    {/* Features */}
+                    <TableCell>
+                      <div className="flex flex-wrap gap-1 max-w-[200px]">
+                        {product.features_id && product.features_id.length > 0 ? (
+                          <>
+                            {product.features_id.slice(0, 2).map((feature, idx) => (
+                              <Badge key={idx} variant="outline" className="text-xs">
+                                {feature}
+                              </Badge>
+                            ))}
+                            {product.features_id.length > 2 && (
+                              <Badge variant="outline" className="text-xs bg-slate-50">
+                                +{product.features_id.length - 2}
+                              </Badge>
+                            )}
+                          </>
+                        ) : (
+                          <span className="text-xs text-muted-foreground">-</span>
+                        )}
+                      </div>
+                    </TableCell>
+
+                    {/* Actions */}
+                    <TableCell className="text-right">
+                      <div className="flex justify-end gap-1">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8"
+                          onClick={() => openEditDialog(product)}
+                        >
+                          <Edit02Icon className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 text-red-500 hover:text-red-600 hover:bg-red-50"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            openDeleteConfirm(product.id);
+                          }}
+                        >
+                          <Delete02Icon className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </div>
       </div>
 
       {/* Delete Confirmation Modal */}

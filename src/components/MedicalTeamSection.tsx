@@ -87,20 +87,20 @@ const MedicalTeamSection = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                         {doctors.map((member) => (
                             <Card key={member.id} className="rounded-2xl border-border/50 hover:border-primary/20 hover:shadow-lg transition-all overflow-hidden group">
-                                <div className="relative h-64 bg-gradient-to-br from-primary/5 to-secondary/5 flex items-center justify-center overflow-hidden">
+                                <div className="relative h-80 bg-gradient-to-br from-primary/5 to-secondary/5 flex items-start justify-center overflow-hidden">
                                     {/* Doctor image or placeholder */}
                                     {member.image_url ? (
                                         <Image
                                             src={member.image_url}
                                             alt={member.name}
                                             fill
-                                            className="object-cover object-center group-hover:scale-105 transition-transform duration-300"
-                                            style={{ objectPosition: 'center 30%' }}
+                                            className="object-cover group-hover:scale-105 transition-transform duration-300"
+                                            style={{ objectPosition: 'top center' }}
                                             sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
                                             quality={85}
                                         />
                                     ) : (
-                                        <div className="h-40 w-40 rounded-full bg-white/80 flex items-center justify-center border-4 border-white shadow-lg">
+                                        <div className="h-40 w-40 rounded-full bg-white/80 flex items-center justify-center border-4 border-white shadow-lg mt-16">
                                             <span className="text-4xl font-bold text-primary">{member.name.charAt(0)}</span>
                                         </div>
                                     )}

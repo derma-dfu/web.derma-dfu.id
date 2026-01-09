@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from 'react';
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -36,6 +37,9 @@ const MedicalTeamSection = dynamic(() => import('@/components/MedicalTeamSection
 const TestimonialsSection = dynamic(() => import('@/components/TestimonialsSection'), {
     loading: () => <div className="py-16 flex items-center justify-center"><div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full"></div></div>
 });
+const PartnerLogos = dynamic(() => import('@/components/PartnerLogos'), {
+    loading: () => <div className="py-12 bg-muted/20 flex items-center justify-center"><div className="animate-spin h-6 w-6 border-4 border-primary border-t-transparent rounded-full"></div></div>
+});
 
 const Home = () => {
     const { t } = useLanguage();
@@ -67,32 +71,31 @@ const Home = () => {
         }
     ];
 
-    const products = [
-        {
-            title: { id: 'Pembalut Luka Canggih', en: 'Advanced Wound Dressings' },
-            description: {
-                id: 'Pembalut khusus untuk luka diabetes dengan teknologi penyembuhan modern',
-                en: 'Specialized dressings for diabetic wounds with modern healing technology'
-            },
-            icon: <MedicalMaskIcon className="h-16 w-16 text-primary" />
-        },
-        {
-            title: { id: 'Sistem Monitoring', en: 'Monitoring System' },
-            description: {
-                id: 'Pantau perkembangan luka dengan teknologi digital',
-                en: 'Track wound progress with digital technology'
-            },
-            icon: <ChartHistogramIcon className="h-16 w-16 text-primary" />
-        },
-        {
-            title: { id: 'Konsultasi Online', en: 'Online Consultation' },
-            description: {
-                id: 'Konsultasi jarak jauh dengan spesialis perawatan luka',
-                en: 'Remote consultation with wound care specialists'
-            },
-            icon: <Message02Icon className="h-16 w-16 text-primary" />
-        }
-    ];
+    const [products, setProducts] = useState<any[]>([]);
+    const [productsLoading, setProductsLoading] = useState(true);
+
+    // Fetch products from database
+    useEffect(() => {
+        const fetchProducts = async () => {
+            try {
+                const { supabase } = await import('@/integrations/supabase/client');
+                const { data, error } = await supabase
+                    .from('products')
+                    .select('id, title_id, title_en, description_id, description_en, price, image_url, category')
+                    .eq('is_active', true)
+                    .order('created_at', { ascending: false })
+                    .limit(6);
+
+                if (error) throw error;
+                setProducts(data || []);
+            } catch (err) {
+                console.error('Error fetching products:', err);
+            } finally {
+                setProductsLoading(false);
+            }
+        };
+        fetchProducts();
+    }, []);
 
     const benefits = [
         { id: 'Akses ke pasar yang lebih luas', en: 'Access to wider market' },
@@ -159,6 +162,9 @@ const Home = () => {
             {/* Trust Badges Section */}
             <TrustBadges />
 
+            {/* Partner Logos Section */}
+            <PartnerLogos />
+
 
 
             {/* Webinar Promotion Section (Dynamic) */}
@@ -201,22 +207,57 @@ const Home = () => {
                         </Link>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                        {products.map((product, index) => (
-                            <Card key={index} className="hover-scale rounded-2xl shadow-md flex flex-col">
-                                <CardHeader>
-                                    <div className="flex justify-center mb-4">{product.icon}</div>
-                                    <CardTitle className="text-secondary">{t(product.title)}</CardTitle>
-                                </CardHeader>
-                                <CardContent className="flex-grow flex flex-col">
-                                    <CardDescription className="text-base flex-grow">{t(product.description)}</CardDescription>
-                                    <Link href="/products">
-                                        <Button className="mt-4 w-full min-h-[44px]">
-                                            {t({ id: 'Pelajari Lebih Lanjut', en: 'Learn More' })}
-                                        </Button>
-                                    </Link>
-                                </CardContent>
-                            </Card>
-                        ))}
+                        {productsLoading ? (
+                            // Loading skeleton
+                            [1, 2, 3].map((i) => (
+                                <Card key={i} className="rounded-2xl shadow-md animate-pulse">
+                                    <CardHeader>
+                                        <div className="w-full h-40 bg-slate-200 rounded-lg mb-4"></div>
+                                        <div className="h-6 bg-slate-200 rounded w-3/4"></div>
+                                    </CardHeader>
+                                    <CardContent>
+                                        <div className="h-4 bg-slate-200 rounded w-full mb-2"></div>
+                                        <div className="h-4 bg-slate-200 rounded w-2/3"></div>
+                                    </CardContent>
+                                </Card>
+                            ))
+                        ) : products.length === 0 ? (
+                            <div className="col-span-3 text-center py-12 text-muted-foreground">
+                                {t({ id: 'Belum ada produk tersedia', en: 'No products available yet' })}
+                            </div>
+                        ) : (
+                            products.slice(0, 6).map((product) => (
+                                <Card key={product.id} className="hover-scale rounded-2xl shadow-md flex flex-col overflow-hidden">
+                                    {product.image_url && (
+                                        <div className="w-full h-48 overflow-hidden">
+                                            <img
+                                                src={product.image_url}
+                                                alt={t({ id: product.title_id, en: product.title_en })}
+                                                className="w-full h-full object-cover"
+                                            />
+                                        </div>
+                                    )}
+                                    <CardHeader>
+                                        <CardTitle className="text-secondary">
+                                            {t({ id: product.title_id, en: product.title_en })}
+                                        </CardTitle>
+                                        <p className="text-lg font-bold text-primary">
+                                            Rp {product.price?.toLocaleString('id-ID')}
+                                        </p>
+                                    </CardHeader>
+                                    <CardContent className="flex-grow flex flex-col">
+                                        <CardDescription className="text-base flex-grow line-clamp-2">
+                                            {t({ id: product.description_id, en: product.description_en })}
+                                        </CardDescription>
+                                        <Link href="/products">
+                                            <Button className="mt-4 w-full min-h-[44px]">
+                                                {t({ id: 'Lihat Detail', en: 'View Details' })}
+                                            </Button>
+                                        </Link>
+                                    </CardContent>
+                                </Card>
+                            ))
+                        )}
                     </div>
                 </div>
             </section>

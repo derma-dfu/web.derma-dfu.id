@@ -1,5 +1,5 @@
 
-import { pgTable, text, timestamp, boolean, jsonb } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, boolean, jsonb, integer } from "drizzle-orm/pg-core";
 
 export const user = pgTable("user", {
     id: text("id").primaryKey(),
@@ -73,6 +73,8 @@ export const products = pgTable("products", {
     image_url: text("image_url"),
     features_id: text("features_id").array(),
     features_en: text("features_en").array(),
+    price: integer("price").default(0).notNull(), // Price in IDR
+    partner_id: text("partner_id").references(() => partners.id),
     is_active: boolean("is_active").default(true).notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull()
@@ -147,6 +149,45 @@ export const productCategories = pgTable("product_categories", {
     name_en: text("name_en").notNull(),
     slug: text("slug").notNull().unique(),
     is_active: boolean("is_active").default(true).notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull()
+});
+
+// === PAYMENT & ORDER TABLES ===
+
+export const orders = pgTable("orders", {
+    id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+    user_id: text("user_id").notNull().references(() => user.id),
+    total_amount: integer("total_amount").notNull(), // in IDR
+    shipping_address: text("shipping_address").notNull(),
+    shipping_name: text("shipping_name").notNull(),
+    shipping_phone: text("shipping_phone").notNull(),
+    status: text("status").default("pending").notNull(), // pending, paid, shipped, completed, cancelled
+    notes: text("notes"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull()
+});
+
+export const orderItems = pgTable("order_items", {
+    id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+    order_id: text("order_id").notNull().references(() => orders.id),
+    product_id: text("product_id").notNull().references(() => products.id),
+    product_title: text("product_title").notNull(), // snapshot at purchase time
+    quantity: integer("quantity").notNull(),
+    unit_price: integer("unit_price").notNull(), // snapshot of price at purchase time
+    createdAt: timestamp("created_at").defaultNow().notNull()
+});
+
+export const payments = pgTable("payments", {
+    id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+    user_id: text("user_id").notNull().references(() => user.id),
+    order_id: text("order_id").notNull().references(() => orders.id),
+    amount: integer("amount").notNull(), // in IDR
+    status: text("status").default("pending").notNull(), // pending, paid, failed, expired
+    xendit_invoice_id: text("xendit_invoice_id"),
+    xendit_invoice_url: text("xendit_invoice_url"),
+    xendit_external_id: text("xendit_external_id"),
+    paid_at: timestamp("paid_at"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull()
 });

@@ -138,8 +138,13 @@ export const DoctorManagement = () => {
         e.preventDefault();
         setIsSubmitting(true);
 
+        // Use English values if provided, otherwise fallback to Indonesian
         const payload = {
             ...formData,
+            role_en: formData.role_en || formData.role_id,
+            specialty_en: formData.specialty_en || formData.specialty_id,
+            bio_en: formData.bio_en || formData.bio_id,
+            experience_en: formData.experience_en || formData.experience_id,
             is_active: formData.is_active ?? true
         };
 
@@ -265,9 +270,14 @@ export const DoctorManagement = () => {
                             </DialogTitle>
                         </DialogHeader>
                         <form onSubmit={handleSubmit} className="space-y-4">
+                            {/* Info banner */}
+                            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-sm text-blue-700">
+                                💡 {t({ id: 'Field English bersifat opsional. Jika dikosongkan, akan menggunakan teks Indonesia.', en: 'English fields are optional. If left empty, Indonesian text will be used.' })}
+                            </div>
+
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div className="space-y-2 md:col-span-2">
-                                    <Label>Name (Title & Full Name)</Label>
+                                    <Label>{t({ id: 'Nama (Gelar & Nama Lengkap)', en: 'Name (Title & Full Name)' })} *</Label>
                                     <Input
                                         required
                                         value={formData.name}
@@ -278,7 +288,7 @@ export const DoctorManagement = () => {
 
                                 {/* Roles */}
                                 <div className="space-y-2">
-                                    <Label>Job Role (ID)</Label>
+                                    <Label>{t({ id: 'Jabatan (ID)', en: 'Job Role (ID)' })} *</Label>
                                     <Input
                                         required
                                         value={formData.role_id}
@@ -287,18 +297,17 @@ export const DoctorManagement = () => {
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <Label>Job Role (EN)</Label>
+                                    <Label>{t({ id: 'Jabatan (EN)', en: 'Job Role (EN)' })}</Label>
                                     <Input
-                                        required
                                         value={formData.role_en}
                                         onChange={e => setFormData({ ...formData, role_en: e.target.value })}
-                                        placeholder="e.g. Internal Medicine Specialist"
+                                        placeholder={t({ id: 'Opsional - gunakan Indonesia jika kosong', en: 'Optional - uses Indonesian if empty' })}
                                     />
                                 </div>
 
                                 {/* Specialization */}
                                 <div className="space-y-2">
-                                    <Label>Specialization (ID)</Label>
+                                    <Label>{t({ id: 'Spesialisasi (ID)', en: 'Specialization (ID)' })} *</Label>
                                     <Input
                                         required
                                         value={formData.specialty_id}
@@ -307,18 +316,17 @@ export const DoctorManagement = () => {
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <Label>Specialization (EN)</Label>
+                                    <Label>{t({ id: 'Spesialisasi (EN)', en: 'Specialization (EN)' })}</Label>
                                     <Input
-                                        required
                                         value={formData.specialty_en}
                                         onChange={e => setFormData({ ...formData, specialty_en: e.target.value })}
-                                        placeholder="e.g. Diabetes & Metabolism"
+                                        placeholder={t({ id: 'Opsional - gunakan Indonesia jika kosong', en: 'Optional - uses Indonesian if empty' })}
                                     />
                                 </div>
 
                                 {/* Experience */}
                                 <div className="space-y-2">
-                                    <Label>Experience (ID)</Label>
+                                    <Label>{t({ id: 'Pengalaman (ID)', en: 'Experience (ID)' })}</Label>
                                     <Input
                                         value={formData.experience_id || ''}
                                         onChange={e => setFormData({ ...formData, experience_id: e.target.value })}
@@ -326,11 +334,11 @@ export const DoctorManagement = () => {
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <Label>Experience (EN)</Label>
+                                    <Label>{t({ id: 'Pengalaman (EN)', en: 'Experience (EN)' })}</Label>
                                     <Input
                                         value={formData.experience_en || ''}
                                         onChange={e => setFormData({ ...formData, experience_en: e.target.value })}
-                                        placeholder="e.g. 15+ Years"
+                                        placeholder={t({ id: 'Opsional - gunakan Indonesia jika kosong', en: 'Optional - uses Indonesian if empty' })}
                                     />
                                 </div>
                             </div>

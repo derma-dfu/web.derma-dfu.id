@@ -47,6 +47,7 @@ export const useUserRole = () => {
 
   return {
     user,
+    userId: user?.id || null,
     role,
     isAdmin: role === 'admin',
     isAuthenticated: !!user,

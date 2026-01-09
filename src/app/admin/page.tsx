@@ -13,7 +13,8 @@ import {
     Logout03Icon,
     UserCircleIcon,
     Menu01Icon,
-    Calendar03Icon
+    Calendar03Icon,
+    ShoppingBasket01Icon
 } from 'hugeicons-react';
 import { supabase } from '@/integrations/supabase/client';
 import { ProductManagement } from '@/components/admin/ProductManagement';
@@ -22,6 +23,7 @@ import { PartnerManagement } from '@/components/admin/PartnerManagement';
 import { WebinarManagement } from '@/components/admin/WebinarManagement';
 import { DoctorManagement } from '@/components/admin/DoctorManagement';
 import { DashboardOverview } from '@/components/admin/DashboardOverview';
+import { OrderManagement } from '@/components/admin/OrderManagement';
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from '@/components/ui/sheet';
 
 const Admin = () => {
@@ -67,6 +69,7 @@ const Admin = () => {
 
     const MENU_ITEMS = [
         { id: 'dashboard', label: { id: 'Dashboard', en: 'Dashboard' }, icon: DashboardSquare01Icon },
+        { id: 'orders', label: { id: 'Pesanan', en: 'Orders' }, icon: ShoppingBasket01Icon },
         { id: 'products', label: { id: 'Produk', en: 'Products' }, icon: PackageIcon },
         { id: 'articles', label: { id: 'Artikel', en: 'Articles' }, icon: News01Icon },
         { id: 'webinars', label: { id: 'Webinar', en: 'Webinars' }, icon: Calendar03Icon },
@@ -178,6 +181,7 @@ const Admin = () => {
                         <DashboardOverview />
                     ) : (
                         <div className="min-h-[400px] lg:min-h-[500px]">
+                            {activeTab === 'orders' && <OrderManagement />}
                             {activeTab === 'products' && <ProductManagement />}
                             {activeTab === 'articles' && <ArticleManagement />}
                             {activeTab === 'partners' && <PartnerManagement />}

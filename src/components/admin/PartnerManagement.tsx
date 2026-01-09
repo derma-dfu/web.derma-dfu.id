@@ -10,10 +10,19 @@ import {
   Loading03Icon,
   Add01Icon,
   Edit02Icon,
-  Delete02Icon
+  Delete02Icon,
+  Image02Icon
 } from 'hugeicons-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Switch } from '@/components/ui/switch';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { useLanguage } from '@/contexts/LanguageContext';
 
 interface Partner {
@@ -37,6 +46,7 @@ export const PartnerManagement = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingPartner, setEditingPartner] = useState<Partner | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [logoUrl, setLogoUrl] = useState<string | null>(null);
   const { toast } = useToast();
 
   const [formData, setFormData] = useState({
@@ -108,14 +118,15 @@ export const PartnerManagement = () => {
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent, logoUrl?: string) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     try {
+      // Use English description if provided, otherwise fallback to Indonesian
       const partnerData = {
         name: formData.name,
         description_id: formData.description_id || null,
-        description_en: formData.description_en || null,
+        description_en: formData.description_en || formData.description_id || null,
         website_url: formData.website_url || null,
         contact_email: formData.contact_email || null,
         contact_phone: formData.contact_phone || null,
@@ -193,6 +204,7 @@ export const PartnerManagement = () => {
 
   const resetForm = () => {
     setEditingPartner(null);
+    setLogoUrl(null);
     setFormData({
       name: '',
       description_id: '',
@@ -231,8 +243,13 @@ export const PartnerManagement = () => {
               </DialogTitle>
             </DialogHeader>
             <form onSubmit={handleSubmit} className="space-y-4">
+              {/* Info banner */}
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-sm text-blue-700">
+                💡 {t({ id: 'Field English bersifat opsional. Jika dikosongkan, akan menggunakan teks Indonesia.', en: 'English fields are optional. If left empty, Indonesian text will be used.' })}
+              </div>
+
               <div>
-                <Label>Partner Name</Label>
+                <Label>{t({ id: 'Nama Partner', en: 'Partner Name' })} *</Label>
                 <Input
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
@@ -240,20 +257,22 @@ export const PartnerManagement = () => {
                 />
               </div>
 
-              <div>
-                <Label>Description (ID)</Label>
-                <Textarea
-                  value={formData.description_id}
-                  onChange={(e) => setFormData({ ...formData, description_id: e.target.value })}
-                />
-              </div>
-
-              <div>
-                <Label>Description (EN)</Label>
-                <Textarea
-                  value={formData.description_en}
-                  onChange={(e) => setFormData({ ...formData, description_en: e.target.value })}
-                />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label>{t({ id: 'Deskripsi (ID)', en: 'Description (ID)' })}</Label>
+                  <Textarea
+                    value={formData.description_id}
+                    onChange={(e) => setFormData({ ...formData, description_id: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <Label>{t({ id: 'Deskripsi (EN)', en: 'Description (EN)' })}</Label>
+                  <Textarea
+                    value={formData.description_en}
+                    onChange={(e) => setFormData({ ...formData, description_en: e.target.value })}
+                    placeholder={t({ id: 'Opsional - gunakan Indonesia jika kosong', en: 'Optional - uses Indonesian if empty' })}
+                  />
+                </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -293,14 +312,15 @@ export const PartnerManagement = () => {
               </div>
 
               <div>
-                <Label>Partner Logo</Label>
+                <Label>{t({ id: 'Logo Partner', en: 'Partner Logo' })}</Label>
                 <Input
                   type="file"
                   accept="image/*"
                   onChange={async (e) => {
                     const url = await handleImageUpload(e);
                     if (url) {
-                      await handleSubmit(e as any, url);
+                      setLogoUrl(url);
+                      toast({ title: t({ id: 'Logo berhasil diupload', en: 'Logo uploaded successfully' }) });
                     }
                   }}
                   disabled={uploading}
@@ -324,42 +344,87 @@ export const PartnerManagement = () => {
         </Dialog>
       </div>
 
-      <div className="grid gap-4">
-        {partners.map((partner) => (
-          <Card key={partner.id}>
-            <CardHeader>
-              <div className="flex justify-between items-start">
-                <div className="flex items-center gap-4">
-                  {partner.logo_url && (
-                    <img src={partner.logo_url} alt={partner.name} className="h-16 w-16 object-contain" />
-                  )}
-                  <div>
-                    <CardTitle>{partner.name}</CardTitle>
-                    <p className="text-sm text-muted-foreground">{partner.status}</p>
-                  </div>
-                </div>
-                <div className="flex gap-2">
-                  <Button variant="outline" size="sm" onClick={() => openEditDialog(partner)}>
-                    <Edit02Icon className="h-4 w-4" />
-                  </Button>
-                  <Button variant="destructive" size="sm" onClick={() => handleDelete(partner.id)}>
-                    <Delete02Icon className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm">{partner.description_en}</p>
-              <div className="mt-2 text-xs text-muted-foreground">
-                {partner.website_url && <p>🌐 {partner.website_url}</p>}
-                {partner.contact_email && <p>📧 {partner.contact_email}</p>}
-                {partner.contact_phone && <p>📞 {partner.contact_phone}</p>}
-                <p className="mt-1">Status: {partner.is_active ? '✓ Active' : '✗ Inactive'}</p>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+      <div className="bg-white rounded-lg border shadow-sm overflow-hidden">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Logo</TableHead>
+              <TableHead>Partner Name</TableHead>
+              <TableHead>Contact Info</TableHead>
+              <TableHead>Website</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {partners.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                  {t({ id: 'Belum ada data mitra.', en: 'No partners found.' })}
+                </TableCell>
+              </TableRow>
+            ) : (
+              partners.map((partner) => (
+                <TableRow key={partner.id}>
+                  <TableCell>
+                    <div className="h-12 w-12 relative rounded overflow-hidden bg-slate-50 border flex items-center justify-center">
+                      {partner.logo_url ? (
+                        <img
+                          src={partner.logo_url}
+                          alt={partner.name}
+                          className="h-10 w-10 object-contain"
+                        />
+                      ) : (
+                        <Image02Icon className="h-6 w-6 text-slate-300" />
+                      )}
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="font-semibold">{partner.name}</div>
+                    <div className="text-xs text-muted-foreground max-w-[200px] truncate">
+                      {partner.description_id}
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="text-sm">
+                      {partner.contact_email && <div className="flex items-center gap-1">📧 {partner.contact_email}</div>}
+                      {partner.contact_phone && <div className="flex items-center gap-1">📞 {partner.contact_phone}</div>}
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    {partner.website_url ? (
+                      <a href={partner.website_url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline text-sm">
+                        {partner.website_url}
+                      </a>
+                    ) : (
+                      <span className="text-muted-foreground text-sm">-</span>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    <span className={`px-2 py-1 rounded-full text-xs font-semibold ${partner.is_active
+                      ? 'bg-green-100 text-green-700'
+                      : 'bg-gray-100 text-gray-700'
+                      }`}>
+                      {partner.is_active ? 'Active' : 'Inactive'}
+                    </span>
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <div className="flex justify-end gap-2">
+                      <Button variant="ghost" size="icon" onClick={() => openEditDialog(partner)}>
+                        <Edit02Icon className="h-4 w-4" />
+                      </Button>
+                      <Button variant="ghost" size="icon" className="text-red-500 hover:text-red-600 hover:bg-red-50" onClick={() => handleDelete(partner.id)}>
+                        <Delete02Icon className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
+          </TableBody>
+        </Table>
       </div>
     </div>
+
   );
 };
