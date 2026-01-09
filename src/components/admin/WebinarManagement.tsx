@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Json } from "@/integrations/supabase/types";
 import { Button } from "@/components/ui/button";
@@ -83,7 +83,7 @@ export const WebinarManagement = () => {
     const [tempSpeaker, setTempSpeaker] = useState<Speaker>({ name: "", role: "" });
 
     // Fetch Webinars
-    const fetchWebinars = async () => {
+    const fetchWebinars = useCallback(async () => {
         setIsLoading(true);
         const { data, error } = await supabase
             .from("webinars")
@@ -105,11 +105,11 @@ export const WebinarManagement = () => {
             setWebinars(formattedData);
         }
         setIsLoading(false);
-    };
+    }, [toast]);
 
     useEffect(() => {
         fetchWebinars();
-    }, []);
+    }, [fetchWebinars]);
 
     // Handle Image Upload
     const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {

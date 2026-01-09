@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -77,7 +77,7 @@ export const DoctorManagement = () => {
     const [tempCredential, setTempCredential] = useState("");
 
     // Fetch Doctors
-    const fetchDoctors = async () => {
+    const fetchDoctors = useCallback(async () => {
         setIsLoading(true);
         const { data, error } = await supabase
             .from("doctors" as any)
@@ -94,11 +94,11 @@ export const DoctorManagement = () => {
             setDoctors((data as unknown as Doctor[]) || []);
         }
         setIsLoading(false);
-    };
+    }, [toast]);
 
     useEffect(() => {
         fetchDoctors();
-    }, []);
+    }, [fetchDoctors]);
 
     // Handle Image Upload
     const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {

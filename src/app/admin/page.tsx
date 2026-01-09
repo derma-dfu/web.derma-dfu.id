@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useUserRole } from '@/hooks/useUserRole';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -25,6 +25,56 @@ import { DoctorManagement } from '@/components/admin/DoctorManagement';
 import { DashboardOverview } from '@/components/admin/DashboardOverview';
 import { OrderManagement } from '@/components/admin/OrderManagement';
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from '@/components/ui/sheet';
+
+// --- Sidebar Content Component (Moved Outside & Before Usage) ---
+
+interface SidebarContentProps {
+    t: any;
+    activeTab: string;
+    setActiveTab: (id: string) => void;
+    onItemClick?: (id: string) => void;
+    handleLogout: () => void;
+    menuItems: any[];
+}
+
+const SidebarContent = ({ t, activeTab, setActiveTab, onItemClick, handleLogout, menuItems }: SidebarContentProps) => (
+    <>
+        <div className="px-6 mb-8">
+            <h2 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">
+                {t({ id: 'Manajemen', en: 'Management' })}
+            </h2>
+            <div className="space-y-2">
+                {menuItems.map((item) => (
+                    <button
+                        key={item.id}
+                        onClick={() => onItemClick ? onItemClick(item.id) : setActiveTab(item.id)}
+                        className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all ${activeTab === item.id
+                            ? 'bg-primary/10 text-primary shadow-sm'
+                            : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                            }`}
+                    >
+                        <item.icon className="mr-3 h-5 w-5" />
+                        {t(item.label)}
+                    </button>
+                ))}
+            </div>
+        </div>
+
+        <div className="px-6 mt-auto space-y-4">
+            <button
+                onClick={handleLogout}
+                className="w-full flex items-center px-4 py-3 text-sm font-medium rounded-xl text-red-600 hover:bg-red-50 hover:text-red-700 transition-colors"
+            >
+                <div className="mr-3 h-5 w-5">
+                    <Logout03Icon className="w-full h-full" />
+                </div>
+                {t({ id: 'Keluar', en: 'Logout' })}
+            </button>
+        </div>
+    </>
+);
+
+// --- Main Admin Component ---
 
 const Admin = () => {
     const { t } = useLanguage();
@@ -126,54 +176,50 @@ const Admin = () => {
                     menuItems={MENU_ITEMS}
                 />
             </aside>
-            );
+
+            {/* Main Content */}
+            <main className="flex-1 lg:ml-64 p-4 sm:p-6 lg:p-10 transition-all">
+                <div className="max-w-7xl mx-auto">
+                    {/* Dynamic Header - Hidden on mobile since we have the sticky header */}
+                    <div className="mb-6 lg:mb-8 hidden lg:block">
+                        <h1 className="text-2xl lg:text-3xl font-bold text-slate-900 tracking-tight flex items-center gap-3">
+                            {(() => {
+                                const ItemIcon = MENU_ITEMS.find(i => i.id === activeTab)?.icon || DashboardSquare01Icon;
+                                return <ItemIcon className="h-7 w-7 lg:h-8 lg:w-8 text-primary" />;
+                            })()}
+                            {currentTitle}
+                        </h1>
+                        {activeTab === 'dashboard' && (
+                            <p className="text-slate-500 mt-2 ml-10 lg:ml-11">
+                                {t({ id: 'Selamat datang kembali, Admin.', en: 'Welcome back, Admin.' })}
+                            </p>
+                        )}
+                    </div>
+
+                    {/* Mobile Header for Dashboard welcome message */}
+                    {activeTab === 'dashboard' && (
+                        <p className="text-slate-500 mb-4 lg:hidden text-sm">
+                            {t({ id: 'Selamat datang kembali, Admin.', en: 'Welcome back, Admin.' })}
+                        </p>
+                    )}
+
+                    {/* Dynamic Content Area */}
+                    {activeTab === 'dashboard' ? (
+                        <DashboardOverview />
+                    ) : (
+                        <div className="min-h-[400px] lg:min-h-[500px]">
+                            {activeTab === 'orders' && <OrderManagement />}
+                            {activeTab === 'products' && <ProductManagement />}
+                            {activeTab === 'articles' && <ArticleManagement />}
+                            {activeTab === 'partners' && <PartnerManagement />}
+                            {activeTab === 'webinars' && <WebinarManagement />}
+                            {activeTab === 'doctors' && <DoctorManagement />}
+                        </div>
+                    )}
+                </div>
+            </main>
+        </div>
+    );
 };
 
-            export default Admin;
-
-            // Helper component for Sidebar Content
-            interface SidebarContentProps {
-                t: any;
-            activeTab: string;
-    setActiveTab: (id: string) => void;
-    onItemClick?: (id: string) => void;
-    handleLogout: () => void;
-            menuItems: any[];
-}
-
-            const SidebarContent = ({t, activeTab, setActiveTab, onItemClick, handleLogout, menuItems}: SidebarContentProps) => (
-            <>
-                <div className="px-6 mb-8">
-                    <h2 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">
-                        {t({ id: 'Manajemen', en: 'Management' })}
-                    </h2>
-                    <div className="space-y-2">
-                        {menuItems.map((item) => (
-                            <button
-                                key={item.id}
-                                onClick={() => onItemClick ? onItemClick(item.id) : setActiveTab(item.id)}
-                                className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all ${activeTab === item.id
-                                    ? 'bg-primary/10 text-primary shadow-sm'
-                                    : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
-                                    }`}
-                            >
-                                <item.icon className="mr-3 h-5 w-5" />
-                                {t(item.label)}
-                            </button>
-                        ))}
-                    </div>
-                </div>
-
-                <div className="px-6 mt-auto space-y-4">
-                    <button
-                        onClick={handleLogout}
-                        className="w-full flex items-center px-4 py-3 text-sm font-medium rounded-xl text-red-600 hover:bg-red-50 hover:text-red-700 transition-colors"
-                    >
-                        <div className="mr-3 h-5 w-5">
-                            <Logout03Icon className="w-full h-full" />
-                        </div>
-                        {t({ id: 'Keluar', en: 'Logout' })}
-                    </button>
-                </div>
-            </>
-            );
+export default Admin;
