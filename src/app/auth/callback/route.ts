@@ -9,40 +9,51 @@ export async function GET(request: Request) {
     const next = searchParams.get('next') ?? '/dashboard';
 
     if (code) {
-        const cookieStore = await cookies();
-        const supabase = createServerClient(
-            process.env.NEXT_PUBLIC_SUPABASE_URL!,
-            process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-            {
-                cookies: {
-                    get(name: string) {
-                        return cookieStore.get(name)?.value;
+        try {
+            const cookieStore = await cookies();
+            const supabase = createServerClient(
+                process.env.NEXT_PUBLIC_SUPABASE_URL!,
+                process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+                {
+                    cookies: {
+                        getAll() {
+                            return cookieStore.getAll();
+                        },
+                        setAll(cookiesToSet) {
+                            try {
+                                cookiesToSet.forEach(({ name, value, options }) =>
+                                    cookieStore.set(name, value, options)
+                                );
+                            } catch {
+                                // The `setAll` method was called from a Server Component.
+                                // This can be ignored if you have middleware refreshing
+                                // user sessions.
+                            }
+                        },
                     },
-                    set(name: string, value: string, options: CookieOptions) {
-                        cookieStore.set({ name, value, ...options });
-                    },
-                    remove(name: string, options: CookieOptions) {
-                        cookieStore.set({ name, value: '', ...options });
-                    },
-                },
+                }
+            );
+
+            const { error } = await supabase.auth.exchangeCodeForSession(code);
+
+            if (!error) {
+                // Successful login
+                const { data: { session } } = await supabase.auth.getSession();
+                const role = session?.user?.user_metadata?.role;
+
+                if (role === 'admin') {
+                    return NextResponse.redirect(`${origin}/admin`);
+                }
+                return NextResponse.redirect(`${origin}${next}`);
+            } else {
+                console.error('Exchange Code Error:', error);
             }
-        );
-
-        const { error } = await supabase.auth.exchangeCodeForSession(code);
-
-        if (!error) {
-            // Check for admin role to redirect appropriately
-            const { data: { session } } = await supabase.auth.getSession();
-            const role = session?.user?.user_metadata?.role;
-
-            if (role === 'admin') {
-                return NextResponse.redirect(`${origin}/admin`);
-            }
-
-            return NextResponse.redirect(`${origin}${next}`);
+        } catch (err) {
+            console.error('Callback Route Error:', err);
+            // Return simple redirect on crash to avoid 502
+            return NextResponse.redirect(`${origin}/auth?error=server_error`);
         }
     }
 
-    // Return the user to an error page with instructions
-    return NextResponse.redirect(`${origin}/auth?error=auth_code_error`);
+    return NextResponse.redirect(`${origin}/auth?error=auth_code_missing`);
 }
