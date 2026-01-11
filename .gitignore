@@ -30,5 +30,6 @@ build
 
 # Environment
 .env
+.env-production
 
 *.tsbuildinfo

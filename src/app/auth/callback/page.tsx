@@ -21,16 +21,22 @@ export default function AuthCallback() {
                 return;
             }
 
+            const redirectUser = (session: any) => {
+                if (session?.user?.user_metadata?.role === 'admin') {
+                    console.log('Admin detected, redirecting to /admin...');
+                    router.push('/admin');
+                } else {
+                    console.log('User detected, redirecting to /dashboard...');
+                    router.push('/dashboard');
+                }
+            };
+
             if (session) {
-                // Session established, redirect to dashboard
-                console.log('Session established, redirecting to dashboard...');
-                router.push('/dashboard');
+                redirectUser(session);
             } else {
-                // If no session found immediately, listen for the auth state change
-                // which happens when Supabase processes the hash
                 const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
                     if (event === 'SIGNED_IN' && session) {
-                        router.push('/dashboard');
+                        redirectUser(session);
                     }
                 });
                 return () => subscription.unsubscribe();
