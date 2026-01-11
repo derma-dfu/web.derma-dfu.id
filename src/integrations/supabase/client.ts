@@ -1,4 +1,4 @@
-import { createClient } from '@supabase/supabase-js';
+import { createBrowserClient } from '@supabase/ssr';
 import type { Database } from './types';
 
 // Use NEXT_PUBLIC_ prefix for client-side environment variables
@@ -10,10 +10,4 @@ if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
   console.warn('Supabase environment variables are missing.');
 }
 
-export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
-  auth: {
-    storage: (typeof window !== 'undefined') ? window.localStorage : undefined,
-    persistSession: true,
-    autoRefreshToken: true,
-  }
-});
+export const supabase = createBrowserClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
