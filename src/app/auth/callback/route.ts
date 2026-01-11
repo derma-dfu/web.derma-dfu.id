@@ -38,8 +38,9 @@ export async function GET(request: Request) {
 
             if (!error) {
                 // Successful login
-                const { data: { session } } = await supabase.auth.getSession();
-                const role = session?.user?.user_metadata?.role;
+                // Use getUser() for better security as per Supabase recommendation
+                const { data: { user } } = await supabase.auth.getUser();
+                const role = user?.user_metadata?.role;
 
                 if (role === 'admin') {
                     return NextResponse.redirect(`${origin}/admin`);
