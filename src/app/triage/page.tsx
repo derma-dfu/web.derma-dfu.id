@@ -143,7 +143,8 @@ export default function TriagePage() {
         setPreview(url);
         setTriageResult(null);
         setPublicSummary(null);
-        setPts([]);
+        setP1(null);
+        setP2(null);
         setPxDist(null);
     };
 
