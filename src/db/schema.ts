@@ -191,3 +191,79 @@ export const payments = pgTable("payments", {
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull()
 });
+
+// === TRIAGE & TELECONSULTATION TABLES ===
+
+export const triageRecords = pgTable("triage_records", {
+    id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+    user_id: text("user_id").notNull().references(() => user.id),
+    photo_url: text("photo_url"),
+    has_scale_card: boolean("has_scale_card").default(false),
+    triage_result: text("triage_result").notNull(), // red, yellow, green
+
+    // Clinical data
+    has_fever: boolean("has_fever").default(false),
+    has_smell_pus: boolean("has_smell_pus").default(false),
+    has_spreading_redness: boolean("has_spreading_redness").default(false),
+    has_rest_pain: boolean("has_rest_pain").default(false),
+    has_foot_pulse: boolean("has_foot_pulse").default(true),
+    has_black_cold_skin: boolean("has_black_cold_skin").default(false),
+    wound_duration: integer("wound_duration"), // days
+    wound_location: text("wound_location"), // toes, midfoot, heel
+    diabetes_history: text("diabetes_history"),
+    kidney_condition: text("kidney_condition"), // none, mild, severe, hemodialysis
+    abi_value: text("abi_value"),
+    notes: text("notes"),
+
+    // AI results
+    infection_class: integer("infection_class"), // 0-3
+    infection_prob: text("infection_prob"),
+    infection_prob_present: text("infection_prob_present"),
+    ischaemia_prob: text("ischaemia_prob"),
+    top_class_name: text("top_class_name"),
+    top_class_prob: text("top_class_prob"),
+
+    // Wound measurements
+    wound_area_px: integer("wound_area_px"),
+    wound_area_pct: text("wound_area_pct"),
+    wound_area_cm2: text("wound_area_cm2"),
+    calibration_mm_per_px: text("calibration_mm_per_px"),
+    model_gated: boolean("model_gated").default(false),
+
+    // Summary
+    ai_summary: jsonb("ai_summary"),
+
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull()
+});
+
+export const referrals = pgTable("referrals", {
+    id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+    triage_id: text("triage_id").notNull().references(() => triageRecords.id),
+    doctor_id: text("doctor_id").references(() => doctors.id),
+    facility: text("facility"),
+    consultation_type: text("consultation_type").notNull(), // teleconsultation, inperson
+    status: text("status").default("pending").notNull(), // pending, confirmed, completed, cancelled
+    scheduled_date: timestamp("scheduled_date"),
+    completed_at: timestamp("completed_at"),
+    notes: text("notes"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull()
+});
+
+export const chatMessages = pgTable("chat_messages", {
+    id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+    referral_id: text("referral_id").notNull().references(() => referrals.id),
+    sender_id: text("sender_id").notNull(),
+    message: text("message").notNull(),
+    is_read: boolean("is_read").default(false).notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull()
+});
+
+export const userRoles = pgTable("user_roles", {
+    id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+    user_id: text("user_id").notNull().references(() => user.id),
+    role: text("role").notNull(), // admin, doctor, user
+    createdAt: timestamp("created_at").defaultNow().notNull()
+});
+

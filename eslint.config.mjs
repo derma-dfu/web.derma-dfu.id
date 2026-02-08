@@ -22,7 +22,8 @@ export default tseslint.config(
       "@typescript-eslint/no-explicit-any": "off",
       "react-hooks/rules-of-hooks": "error",
       "react-hooks/exhaustive-deps": "warn",
-      "react-hooks/purity": "off"
+      "react-hooks/purity": "off",
+      "react-hooks/set-state-in-effect": "off"
     },
   },
 );

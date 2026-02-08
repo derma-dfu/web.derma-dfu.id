@@ -18,7 +18,8 @@ import {
     ArrowRight01Icon,
     Tick02Icon,
     Time01Icon,
-    DeliveryTruck01Icon
+    DeliveryTruck01Icon,
+    Stethoscope02Icon
 } from 'hugeicons-react';
 
 interface Order {
@@ -174,8 +175,29 @@ const Dashboard = () => {
                 </div>
 
                 {/* Quick Actions Row */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-                    {/* Cart Card - Prominent */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+                    {/* AI Triage Card - Primary Feature */}
+                    <Card
+                        className="rounded-2xl shadow-md hover:shadow-lg transition-all cursor-pointer border-green-500/30 bg-gradient-to-br from-green-50 to-emerald-100"
+                        onClick={() => router.push('/triage')}
+                    >
+                        <CardContent className="p-6 flex items-center gap-4">
+                            <div className="w-14 h-14 rounded-full bg-green-500/20 flex items-center justify-center">
+                                <Stethoscope02Icon className="h-7 w-7 text-green-600" />
+                            </div>
+                            <div className="flex-1">
+                                <h3 className="font-semibold text-secondary">
+                                    {t({ id: 'AI Triage Luka', en: 'AI Wound Triage' })}
+                                </h3>
+                                <p className="text-sm text-muted-foreground">
+                                    {t({ id: 'Analisis kondisi luka', en: 'Analyze wound condition' })}
+                                </p>
+                            </div>
+                            <ArrowRight01Icon className="h-5 w-5 text-green-600" />
+                        </CardContent>
+                    </Card>
+
+                    {/* Cart Card */}
                     <Card
                         className="rounded-2xl shadow-md hover:shadow-lg transition-all cursor-pointer border-primary/20 bg-gradient-to-br from-primary/5 to-primary/10"
                         onClick={() => router.push('/cart')}

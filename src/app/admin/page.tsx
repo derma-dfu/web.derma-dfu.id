@@ -14,7 +14,8 @@ import {
     UserCircleIcon,
     Menu01Icon,
     Calendar03Icon,
-    ShoppingBasket01Icon
+    ShoppingBasket01Icon,
+    Stethoscope02Icon
 } from 'hugeicons-react';
 import { supabase } from '@/integrations/supabase/client';
 import { ProductManagement } from '@/components/admin/ProductManagement';
@@ -24,6 +25,7 @@ import { WebinarManagement } from '@/components/admin/WebinarManagement';
 import { DoctorManagement } from '@/components/admin/DoctorManagement';
 import { DashboardOverview } from '@/components/admin/DashboardOverview';
 import { OrderManagement } from '@/components/admin/OrderManagement';
+import { TriageDashboard } from '@/components/admin/TriageDashboard';
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from '@/components/ui/sheet';
 
 // --- Sidebar Content Component (Moved Outside & Before Usage) ---
@@ -120,6 +122,7 @@ const Admin = () => {
 
     const MENU_ITEMS = [
         { id: 'dashboard', label: { id: 'Dashboard', en: 'Dashboard' }, icon: DashboardSquare01Icon },
+        { id: 'triage', label: { id: 'Triage AI', en: 'AI Triage' }, icon: Stethoscope02Icon },
         { id: 'orders', label: { id: 'Pesanan', en: 'Orders' }, icon: ShoppingBasket01Icon },
         { id: 'products', label: { id: 'Produk', en: 'Products' }, icon: PackageIcon },
         { id: 'articles', label: { id: 'Artikel', en: 'Articles' }, icon: News01Icon },
@@ -209,6 +212,7 @@ const Admin = () => {
                         <DashboardOverview />
                     ) : (
                         <div className="min-h-[400px] lg:min-h-[500px]">
+                            {activeTab === 'triage' && <TriageDashboard />}
                             {activeTab === 'orders' && <OrderManagement />}
                             {activeTab === 'products' && <ProductManagement />}
                             {activeTab === 'articles' && <ArticleManagement />}

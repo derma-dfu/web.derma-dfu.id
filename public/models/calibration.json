@@ -1,0 +1,6 @@
+{
+  "ischaemia_threshold": 0.62,
+  "infection_threshold": 0.57,
+  "labels_4class": ["None","Infection","Ischaemia","Both"],
+  "clf_input_size": 256
+}
