@@ -49,7 +49,9 @@ export default function ChatPage() {
     const [sending, setSending] = useState(false);
     const [user, setUser] = useState<any>(null);
     const [referral, setReferral] = useState<Referral | null>(null);
-    const [doctorInfo, setDoctorInfo] = useState<any>(null);
+    // Header info can be Doctor (for patient view) or Patient (for doctor view)
+    const [headerInfo, setHeaderInfo] = useState<any>(null);
+    const [isDoctor, setIsDoctor] = useState(false);
 
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLInputElement>(null);
@@ -91,20 +93,31 @@ export default function ChatPage() {
     const checkAuthAndFetch = async () => {
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) {
-            router.push("/auth");
+            router.push("/auth/login");
             return;
         }
         setUser(user);
-        await Promise.all([fetchReferral(), fetchMessages()]);
+
+        // Check Role
+        const { data: roleData } = await supabase
+            .from('user_roles')
+            .select('role')
+            .eq('user_id', user.id)
+            .single();
+
+        const isDoc = roleData?.role === 'doctor';
+        setIsDoctor(isDoc);
+
+        await Promise.all([fetchReferral(isDoc), fetchMessages()]);
     };
 
-    const fetchReferral = async () => {
+    const fetchReferral = async (isDoc: boolean) => {
         try {
             const { data, error } = await supabase
                 .from("referrals")
                 .select(`
           *,
-          triage_records (photo_url, triage_result, infection_prob, ischaemia_prob)
+          triage_records (user_id, photo_url, triage_result, infection_prob, ischaemia_prob)
         `)
                 .eq("id", referralId)
                 .single();
@@ -112,15 +125,33 @@ export default function ChatPage() {
             if (error) throw error;
             setReferral(data);
 
-            // Fetch doctor info if available
-            if (data.doctor_id) {
-                const { data: doctorData } = await supabase
-                    .from("user")
-                    .select("id, name, image")
-                    .eq("id", data.doctor_id)
-                    .single();
-                setDoctorInfo(doctorData);
+            if (isDoc) {
+                // Doctor View: Show Patient Info
+                // Ideally fetch profile from 'profiles' table if exists, else use placeholder
+                setHeaderInfo({
+                    name: `Pasien #${data.triage_records?.user_id?.substring(0, 8)}`,
+                    image: null, // Patient photo not available in auth yet
+                    role: "Pasien"
+                });
+            } else {
+                // Patient View: Show Doctor Info
+                if (data.doctor_id) {
+                    const { data: doctorData } = await supabase
+                        .from("doctors") // Fetch from doctors table, not user table (simpler)
+                        .select("name, image_url, specialty_id")
+                        .eq("id", data.doctor_id)
+                        .single();
+
+                    if (doctorData) {
+                        setHeaderInfo({
+                            name: doctorData.name,
+                            image: doctorData.image_url,
+                            role: doctorData.specialty_id
+                        });
+                    }
+                }
             }
+
         } catch (err) {
             console.error("Error fetching referral:", err);
             toast.error("Gagal memuat konsultasi");
@@ -188,41 +219,40 @@ export default function ChatPage() {
             <header className="sticky top-0 z-50 bg-card/95 backdrop-blur border-b border-border shadow-md">
                 <div className="container mx-auto px-4 py-3">
                     <div className="flex items-center gap-3">
-                        <Link href="/triage/history">
+                        <Link href={isDoctor ? "/doctor/chat" : "/triage/history"}>
                             <Button variant="ghost" size="icon">
                                 <ArrowLeft className="h-5 w-5" />
                             </Button>
                         </Link>
 
                         <Avatar className="h-10 w-10">
-                            <AvatarImage src={doctorInfo?.image} />
+                            <AvatarImage src={headerInfo?.image} />
                             <AvatarFallback>
-                                {doctorInfo?.name?.substring(0, 2) || "DR"}
+                                {headerInfo?.name?.substring(0, 2).toUpperCase() || (isDoctor ? "PS" : "DR")}
                             </AvatarFallback>
                         </Avatar>
 
                         <div className="flex-1 min-w-0">
                             <h1 className="font-semibold truncate">
-                                {doctorInfo?.name || "Konsultasi Dokter"}
+                                {headerInfo?.name || "Konsultasi"}
                             </h1>
                             <p className="text-xs text-muted-foreground">
-                                {referral?.status === "active" ? "Online" : referral?.status}
+                                {headerInfo?.role || (referral?.status === "active" ? "Online" : referral?.status)}
                             </p>
                         </div>
 
                         <div className="flex gap-2">
+                            {/* Optional Call Buttons */}
                             <Button variant="ghost" size="icon" disabled>
                                 <Phone className="h-5 w-5" />
-                            </Button>
-                            <Button variant="ghost" size="icon" disabled>
-                                <Video className="h-5 w-5" />
                             </Button>
                         </div>
                     </div>
                 </div>
             </header>
 
-            {/* Triage Summary Card */}
+            {/* Triage Summary Card (Only Visible to Doctor usually, but helpful for context) */}
+            {/* We show it to both for now */}
             {referral?.triage_records && (
                 <div className="container mx-auto px-4 py-2">
                     <Card className="bg-muted/50">
@@ -264,8 +294,8 @@ export default function ChatPage() {
                         >
                             <div
                                 className={`max-w-[75%] rounded-2xl px-4 py-2 ${isOwnMessage(msg.sender_id)
-                                        ? "bg-primary text-primary-foreground rounded-br-sm"
-                                        : "bg-muted rounded-bl-sm"
+                                    ? "bg-primary text-primary-foreground rounded-br-sm"
+                                    : "bg-muted rounded-bl-sm"
                                     }`}
                             >
                                 {msg.message_type === "image" && msg.file_url && (
@@ -278,8 +308,8 @@ export default function ChatPage() {
                                 <p className="text-sm whitespace-pre-wrap">{msg.message}</p>
                                 <p
                                     className={`text-xs mt-1 ${isOwnMessage(msg.sender_id)
-                                            ? "text-primary-foreground/70"
-                                            : "text-muted-foreground"
+                                        ? "text-primary-foreground/70"
+                                        : "text-muted-foreground"
                                         }`}
                                 >
                                     {format(new Date(msg.created_at), "HH:mm")}

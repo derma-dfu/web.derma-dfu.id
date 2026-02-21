@@ -32,6 +32,7 @@ const PartnerLogos = () => {
     ];
 
     useEffect(() => {
+        let isMounted = true;
         const fetchPartners = async () => {
             try {
                 const { data, error } = await supabase
@@ -40,15 +41,22 @@ const PartnerLogos = () => {
                     .eq('is_active', true)
                     .order('created_at', { ascending: true });
 
-                if (error) throw error;
-                setPartners((data as Partner[]) || []);
+                if (error) {
+                    // console.error('Error fetching partners (supa):', error);
+                    if (isMounted) setPartners([]);
+                    return;
+                }
+
+                if (isMounted) setPartners((data as Partner[]) || []);
             } catch (error) {
-                console.error('Error fetching partners:', error);
+                // console.error('Error fetching partners (catch):', error);
+                if (isMounted) setPartners([]);
             } finally {
-                setLoading(false);
+                if (isMounted) setLoading(false);
             }
         };
         fetchPartners();
+        return () => { isMounted = false; };
     }, []);
 
     return (

@@ -42,9 +42,9 @@ const Footer = () => {
                 {t({ id: 'Untuk kondisi darurat diabetes, hubungi:', en: 'For diabetes emergencies, contact:' })}
               </p>
             </div>
-            <a href="tel:+6285181709098988" className="bg-red-500 hover:bg-red-600 text-white font-bold px-6 py-3 rounded-xl transition-colors shadow-lg">
+            <a href="tel:083872190880" className="bg-red-500 hover:bg-red-600 text-white font-bold px-6 py-3 rounded-xl transition-colors shadow-lg">
               <CallIcon className="inline h-5 w-5 mr-2" />
-              +62 851-8709-8988
+              0838-7219-0880
             </a>
           </div>
         </div>
@@ -141,7 +141,7 @@ const Footer = () => {
                 </div>
                 <div className="flex flex-col">
                   <span className="text-xs font-semibold text-slate-400">Email</span>
-                  <span className="text-sm font-medium group-hover:text-primary transition-colors">info@derma-dfu.id</span>
+                  <span className="text-sm font-medium group-hover:text-primary transition-colors">iddermadfu@gmail.com</span>
                 </div>
               </li>
               <li className="flex items-start space-x-3 text-slate-600 group">
@@ -150,7 +150,7 @@ const Footer = () => {
                 </div>
                 <div className="flex flex-col">
                   <span className="text-xs font-semibold text-slate-400">Phone</span>
-                  <span className="text-sm font-medium group-hover:text-primary transition-colors">+62 851-8709-8988</span>
+                  <span className="text-sm font-medium group-hover:text-primary transition-colors">0838-7219-0880</span>
                 </div>
               </li>
               <li className="flex items-start space-x-3 text-slate-600 group">
@@ -159,7 +159,14 @@ const Footer = () => {
                 </div>
                 <div className="flex flex-col">
                   <span className="text-xs font-semibold text-slate-400">Location</span>
-                  <span className="text-sm font-medium group-hover:text-primary transition-colors">Jakarta, Indonesia</span>
+                  <a
+                    href="https://share.google/rCPtbIv9gkaaliOlh"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm font-medium group-hover:text-primary transition-colors hover:underline text-left"
+                  >
+                    Komplek Pusbinal PU Jl. Laksamana Malahayati No.1A Blok B, Pd. Bambu, Kec. Duren Sawit, Kota Jakarta Timur, Daerah Khusus Ibukota Jakarta 13430
+                  </a>
                 </div>
               </li>
             </ul>
@@ -225,10 +232,6 @@ const Footer = () => {
             <Link href="/medical-disclaimer" className="text-secondary hover:text-primary transition-colors font-bold underline decoration-2">
               {t({ id: 'Disclaimer Medis', en: 'Medical Disclaimer' })}
             </Link>
-            <span className="text-slate-300">•</span>
-            <span className="text-slate-500 font-medium">
-              {t({ id: 'Nomor Izin: [User perlu isi]', en: 'License No: [User needs to fill]' })}
-            </span>
           </div>
         </div>
       </div>

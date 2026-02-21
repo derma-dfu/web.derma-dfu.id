@@ -952,6 +952,7 @@ export default function TriagePage() {
                 onOpenChange={setShowReferralModal}
                 onSave={handleSaveReferral}
                 t={t}
+                triageResult={triageResult}
             />
         </div>
     );

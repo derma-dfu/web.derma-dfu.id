@@ -4,13 +4,13 @@ import * as ort from "onnxruntime-web";
 
 // ORT bootstrap pakai CDN (non-COI friendly)
 if (typeof window !== "undefined") {
-  // file .wasm diambil dari CDN → tidak perlu upload ke Lovable
+  // Force standard WASM (no SIMD, no Threads) for maximum compatibility
+  // @ts-ignore
   ort.env.wasm.wasmPaths = "https://cdn.jsdelivr.net/npm/onnxruntime-web@1.23.0/dist/";
 
-  // non-COI safe
-  ort.env.wasm.proxy = false; // jangan worker-proxy
-  ort.env.wasm.simd = false; // matikan SIMD
-  ort.env.wasm.numThreads = 1; // single thread
+  ort.env.wasm.proxy = false;
+  ort.env.wasm.simd = false;
+  ort.env.wasm.numThreads = 1;
 
   ort.env.debug = false;
 }
@@ -157,8 +157,8 @@ function queueOrt<T>(task: () => Promise<T>): Promise<T> {
   const run = () => task();
   const p = ortRunChain.then(run, run);
   ortRunChain = p.then(
-    () => {},
-    () => {},
+    () => { },
+    () => { },
   );
   return p;
 }

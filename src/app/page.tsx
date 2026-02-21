@@ -76,6 +76,7 @@ const Home = () => {
 
     // Fetch products from database
     useEffect(() => {
+        let isMounted = true;
         const fetchProducts = async () => {
             try {
                 const { supabase } = await import('@/integrations/supabase/client');
@@ -86,15 +87,22 @@ const Home = () => {
                     .order('created_at', { ascending: false })
                     .limit(6);
 
-                if (error) throw error;
-                setProducts(data || []);
+                if (error) {
+                    console.warn('Error fetching products (supa):', error);
+                    if (isMounted) setProducts([]);
+                    return;
+                }
+
+                if (isMounted) setProducts(data || []);
             } catch (err) {
-                console.error('Error fetching products:', err);
+                console.warn('Error fetching products (catch):', err);
+                if (isMounted) setProducts([]);
             } finally {
-                setProductsLoading(false);
+                if (isMounted) setProductsLoading(false);
             }
         };
         fetchProducts();
+        return () => { isMounted = false; };
     }, []);
 
     const benefits = [
@@ -130,16 +138,16 @@ const Home = () => {
                                 })}
                             </p>
                             <div className="space-y-4">
-                                <a href="https://derma-dfu.id/" target="_blank" rel="noopener noreferrer">
+                                <Link href="/triage">
                                     <Button size="lg" className="min-h-[56px] text-lg px-10 bg-cta hover:bg-cta/90 shadow-lg">
-                                        {t({ id: 'Konsultasi dengan Ahli', en: 'Consult with Experts' })}
+                                        {t({ id: 'Cek Luka Sekarang', en: 'Check Wound Now' })}
                                         <ArrowRight01Icon className="ml-2 h-5 w-5" />
                                     </Button>
-                                </a>
+                                </Link>
                                 <p className="text-xs text-muted-foreground italic">
                                     {t({
-                                        id: 'Konsultasikan dengan tenaga medis berlisensi kami',
-                                        en: 'Consult with our licensed medical professionals'
+                                        id: 'Analisis cepat menggunakan AI + Konsultasi Dokter',
+                                        en: 'Quick analysis using AI + Doctor Consultation'
                                     })}
                                 </p>
                             </div>

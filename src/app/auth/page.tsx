@@ -39,10 +39,19 @@ const Auth = () => {
             try {
                 const { data: { session } } = await supabase.auth.getSession();
                 if (mounted && session && !showVerificationSent) {
-                    // Check role immediately to avoid double redirect
-                    const role = session.user.user_metadata?.role;
+                    // Fetch role from DB for accuracy
+                    const { data: roleData } = await supabase
+                        .from('user_roles')
+                        .select('role')
+                        .eq('user_id', session.user.id)
+                        .single();
+
+                    const role = roleData?.role || session.user.user_metadata?.role;
+
                     if (role === 'admin') {
                         router.replace('/admin');
+                    } else if (role === 'doctor') {
+                        router.replace('/doctor');
                     } else {
                         router.replace('/dashboard');
                     }
@@ -54,11 +63,20 @@ const Auth = () => {
 
         checkSession();
 
-        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+        const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
             if (mounted && session && !showVerificationSent) {
-                const role = session.user.user_metadata?.role;
+                const { data: roleData } = await supabase
+                    .from('user_roles')
+                    .select('role')
+                    .eq('user_id', session.user.id)
+                    .single();
+
+                const role = roleData?.role || session.user.user_metadata?.role;
+
                 if (role === 'admin') {
                     router.replace('/admin');
+                } else if (role === 'doctor') {
+                    router.replace('/doctor');
                 } else {
                     router.replace('/dashboard');
                 }
@@ -85,7 +103,28 @@ const Auth = () => {
                 title: t({ id: 'Login Berhasil', en: 'Login Successful' }),
                 description: t({ id: 'Selamat datang kembali!', en: 'Welcome back!' }),
             });
-            router.push('/dashboard');
+
+            // Check role after login
+            const { data: { user } } = await supabase.auth.getUser();
+            if (user) {
+                const { data: roleData } = await supabase
+                    .from('user_roles')
+                    .select('role')
+                    .eq('user_id', user.id)
+                    .single();
+
+                const role = roleData?.role || user.user_metadata?.role;
+
+                if (role === 'admin') {
+                    router.push('/admin');
+                } else if (role === 'doctor') {
+                    router.push('/doctor');
+                } else {
+                    router.push('/dashboard');
+                }
+            } else {
+                router.push('/dashboard');
+            }
         } else {
             toast({
                 title: t({ id: 'Login Gagal', en: 'Login Failed' }),

@@ -48,6 +48,7 @@ type Doctor = {
     experience_en: string | null;
     credentials: string[] | null;
     is_active: boolean;
+    user_id?: string | null;
 };
 
 export const DoctorManagement = () => {
@@ -72,6 +73,7 @@ export const DoctorManagement = () => {
         experience_en: "",
         credentials: [],
         is_active: true,
+        user_id: "",
     });
     const [editingId, setEditingId] = useState<string | null>(null);
     const [tempCredential, setTempCredential] = useState("");
@@ -220,6 +222,7 @@ export const DoctorManagement = () => {
             experience_en: "",
             credentials: [],
             is_active: true,
+            user_id: "",
         });
         setEditingId(null);
         setTempCredential("");
@@ -286,6 +289,19 @@ export const DoctorManagement = () => {
                                         onChange={e => setFormData({ ...formData, name: e.target.value })}
                                         placeholder="e.g. dr. Andrew Suprayogi, Sp.PD."
                                     />
+                                </div>
+
+                                <div className="space-y-2 md:col-span-2">
+                                    <Label>User ID (Supabase Auth)</Label>
+                                    <Input
+                                        value={formData.user_id || ""}
+                                        onChange={e => setFormData({ ...formData, user_id: e.target.value })}
+                                        placeholder="Paste User UUID here to link account"
+                                        className="font-mono text-xs"
+                                    />
+                                    <p className="text-[10px] text-muted-foreground">
+                                        Optional. Required for Doctor Login.
+                                    </p>
                                 </div>
 
                                 {/* Roles */}

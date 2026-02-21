@@ -26,6 +26,7 @@ const MedicalTeamSection = () => {
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
+        let isMounted = true;
         const fetchDoctors = async () => {
             try {
                 const { data, error } = await supabase
@@ -35,18 +36,21 @@ const MedicalTeamSection = () => {
                     .order('created_at', { ascending: true });
 
                 if (error) {
-                    console.error('Error fetching doctors:', error);
+                    // console.error('Error fetching doctors (supa):', error);
+                    if (isMounted) setDoctors([]);
                 } else {
-                    setDoctors((data as unknown as Doctor[]) || []);
+                    if (isMounted) setDoctors((data as unknown as Doctor[]) || []);
                 }
             } catch (err) {
-                console.error('Unexpected error:', err);
+                // console.warn('Unexpected error fetching doctors:', err);
+                if (isMounted) setDoctors([]);
             } finally {
-                setIsLoading(false);
+                if (isMounted) setIsLoading(false);
             }
         };
 
         fetchDoctors();
+        return () => { isMounted = false; };
     }, []);
 
     if (isLoading) {

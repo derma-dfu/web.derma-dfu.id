@@ -47,12 +47,12 @@ const Products = () => {
                     setProducts(data || []);
                 }
             } catch (error: any) {
-                console.error('Error fetching products:', error);
+                console.warn('Error fetching products:', error);
                 if (mounted) {
                     toast({
-                        title: t({ id: 'Error', en: 'Error' }),
-                        description: error.message,
-                        variant: 'destructive',
+                        title: t({ id: 'Info', en: 'Info' }),
+                        description: t({ id: 'Gagal memuat beberapa produk', en: 'Failed to load some products' }),
+                        variant: 'default', // Changed from destructive to avoid alarming user
                     });
                 }
             } finally {
@@ -72,6 +72,8 @@ const Products = () => {
 
     const categories = [
         { value: 'all', label: { id: 'Semua', en: 'All' } },
+        { value: 'treatment', label: { id: 'Perawatan (Treatment)', en: 'Treatments' } },
+        { value: 'product', label: { id: 'Produk & Suplemen', en: 'Products & Supplements' } },
         { value: 'dressing', label: { id: 'Pembalut Luka', en: 'Wound Dressings' } },
         { value: 'monitoring', label: { id: 'Monitoring', en: 'Monitoring' } },
         { value: 'consultation', label: { id: 'Konsultasi', en: 'Consultation' } }

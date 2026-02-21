@@ -38,6 +38,7 @@ const WebinarSection = () => {
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
+        let isMounted = true;
         const fetchLatestWebinar = async () => {
             try {
                 const { data, error } = await supabase
@@ -46,28 +47,30 @@ const WebinarSection = () => {
                     .eq("is_active", true)
                     .order("date", { ascending: false })
                     .limit(1)
-                    .limit(1)
                     .maybeSingle();
 
                 if (error) {
-                    console.error("Error fetching webinar:", error);
+                    // console.warn("Error fetching webinar (supa):", error);
+                    if (isMounted) setWebinar(null);
                 } else if (data) {
                     const formattedWebinar = {
                         ...data,
                         speakers: data.speakers as unknown as Speaker[]
                     };
-                    setWebinar(formattedWebinar);
+                    if (isMounted) setWebinar(formattedWebinar);
                 } else {
-                    setWebinar(null); // Explicitly set null if no data
+                    if (isMounted) setWebinar(null); // Explicitly set null if no data
                 }
             } catch (err) {
-                console.error("Unexpected error:", err);
+                // console.error("Unexpected error fetching webinar:", err);
+                if (isMounted) setWebinar(null);
             } finally {
-                setIsLoading(false);
+                if (isMounted) setIsLoading(false);
             }
         };
 
         fetchLatestWebinar();
+        return () => { isMounted = false; };
     }, []);
 
     if (isLoading) return null; // Or a skeleton loader
